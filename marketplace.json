@@ -1,0 +1,120 @@
+{
+  "name": "allo-skills-repo",
+  "description": "Allo internal dfcode skill marketplace with productivity, presentation, office, health, and dfcode operations skills.",
+  "plugins": [
+    {
+      "name": "publish-dfcode",
+      "source": "./plugins/publish-dfcode",
+      "description": "发布 dfcode 到 npm。支持正式版和 beta 版。",
+      "version": "1.0.0"
+    },
+    {
+      "name": "query-dfcode-usage",
+      "source": "./plugins/query-dfcode-usage",
+      "description": "查询 dfcode-admin 生产用量记录，支持 SQL 和 admin API 方式。",
+      "version": "1.0.0"
+    },
+    {
+      "name": "guizang-ppt-skill",
+      "source": "./plugins/guizang-ppt-skill",
+      "description": "生成横向翻页网页 PPT，含 WebGL 背景、杂志风和瑞士风模板。",
+      "version": "1.0.0"
+    },
+    {
+      "name": "video-plan",
+      "source": "./plugins/video-plan",
+      "description": "规划短视频、vlog、旅行、纪录片或 cinematic social video 的分场景脚本。",
+      "version": "1.0.0"
+    },
+    {
+      "name": "mega-goal-prompt",
+      "source": "./plugins/mega-goal-prompt",
+      "description": "通过结构化访谈生成适合 Claude Code / Codex CLI 的 long-horizon /goal mega prompt。",
+      "version": "1.0.0"
+    },
+    {
+      "name": "doctor-strange",
+      "source": "./plugins/doctor-strange",
+      "description": "通过因果沙盘和多宇宙推演模拟未来事件、决策和风险路径。",
+      "version": "1.0.0"
+    },
+    {
+      "name": "article-to-html",
+      "source": "./plugins/article-to-html",
+      "description": "将 Markdown 或上下文文档渲染为单文件 paper-style HTML。",
+      "version": "1.0.0"
+    },
+    {
+      "name": "publish-research-site",
+      "source": "./plugins/publish-research-site",
+      "description": "将研究主题转化为带引用、图像和交互体验的网站并部署到 Vercel。",
+      "version": "1.0.0"
+    },
+    {
+      "name": "lab-interpreter",
+      "source": "./plugins/lab-interpreter",
+      "description": "解读医疗化验单、体检报告、血液/尿液/肝肾功能等检查结果。",
+      "version": "1.0.0"
+    },
+    {
+      "name": "emergency-triage",
+      "source": "./plugins/emergency-triage",
+      "description": "中文急诊分诊和症状排查助手，给出挂号科室与检查建议。",
+      "version": "1.0.0"
+    },
+    {
+      "name": "clean-data-xls",
+      "source": "./plugins/clean-data-xls",
+      "description": "清洗 Excel/表格数据：空格、大小写、数字文本、日期、重复值和混合类型。",
+      "version": "1.0.0"
+    },
+    {
+      "name": "audit-xls",
+      "source": "./plugins/audit-xls",
+      "description": "审计电子表格公式、错误和金融模型完整性。",
+      "version": "1.0.0"
+    },
+    {
+      "name": "deck-refresh",
+      "source": "./plugins/deck-refresh",
+      "description": "刷新 PowerPoint deck 中的数字、季度数据、comps 或 earnings 数据。",
+      "version": "1.0.0"
+    },
+    {
+      "name": "ib-check-deck",
+      "source": "./plugins/ib-check-deck",
+      "description": "投行演示文稿质检：数字一致性、叙事匹配、语言和视觉格式检查。",
+      "version": "1.0.0"
+    },
+    {
+      "name": "competitive-analysis",
+      "source": "./plugins/competitive-analysis",
+      "description": "构建竞争格局、竞品分析、market map 和战略分析 deck。",
+      "version": "1.0.0"
+    },
+    {
+      "name": "3-statement-model",
+      "source": "./plugins/3-statement-model",
+      "description": "补全三表财务模型模板：利润表、资产负债表、现金流量表。",
+      "version": "1.0.0"
+    },
+    {
+      "name": "comps-analysis",
+      "source": "./plugins/comps-analysis",
+      "description": "在 Excel 中构建可比公司分析、运营指标和估值倍数基准。",
+      "version": "1.0.0"
+    },
+    {
+      "name": "dcf-model",
+      "source": "./plugins/dcf-model",
+      "description": "构建 DCF 估值模型、现金流预测、WACC 和敏感性分析。",
+      "version": "1.0.0"
+    },
+    {
+      "name": "lbo-model",
+      "source": "./plugins/lbo-model",
+      "description": "补全 LBO 模型模板，校验 IRR/MOIC 和现金清偿机制。",
+      "version": "1.0.0"
+    }
+  ]
+}
