@@ -115,6 +115,12 @@
       "source": "./plugins/lbo-model",
       "description": "补全 LBO 模型模板，校验 IRR/MOIC 和现金清偿机制。",
       "version": "1.0.0"
+    },
+    {
+      "name": "dify-workflow-coding",
+      "source": "./plugins/dify-workflow-coding",
+      "description": "创建、修复、审查和优化 Dify workflow DSL/YAML，包含契约获取、静态校验和 adversarial review 流程。",
+      "version": "1.0.0"
     }
   ]
 }
