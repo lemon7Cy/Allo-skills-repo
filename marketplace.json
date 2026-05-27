@@ -121,6 +121,12 @@
       "source": "./plugins/dify-workflow-coding",
       "description": "创建、修复、审查和优化 Dify workflow DSL/YAML，包含契约获取、静态校验和 adversarial review 流程。",
       "version": "1.0.0"
+    },
+    {
+      "name": "mingxue-kb-query",
+      "source": "./plugins/mingxue-kb-query",
+      "description": "查询明雪知识库，面向电池、SOC、SOH、RUL、Kalman、BMS 和储能问题，并返回带出处的检索答案。",
+      "version": "1.0.0"
     }
   ]
 }
