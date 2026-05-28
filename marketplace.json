@@ -3,18 +3,6 @@
   "description": "Allo internal dfcode skill marketplace with productivity, presentation, office, health, and dfcode operations skills.",
   "plugins": [
     {
-      "name": "publish-dfcode",
-      "source": "./plugins/publish-dfcode",
-      "description": "发布 dfcode 到 npm。支持正式版和 beta 版。",
-      "version": "1.0.0"
-    },
-    {
-      "name": "query-dfcode-usage",
-      "source": "./plugins/query-dfcode-usage",
-      "description": "查询 dfcode-admin 生产用量记录，支持 SQL 和 admin API 方式。",
-      "version": "1.0.0"
-    },
-    {
       "name": "guizang-ppt-skill",
       "source": "./plugins/guizang-ppt-skill",
       "description": "生成横向翻页网页 PPT，含 WebGL 背景、杂志风和瑞士风模板。",
@@ -33,12 +21,6 @@
       "version": "1.0.0"
     },
     {
-      "name": "doctor-strange",
-      "source": "./plugins/doctor-strange",
-      "description": "通过因果沙盘和多宇宙推演模拟未来事件、决策和风险路径。",
-      "version": "1.0.0"
-    },
-    {
       "name": "article-to-html",
       "source": "./plugins/article-to-html",
       "description": "将 Markdown 或上下文文档渲染为单文件 paper-style HTML。",
@@ -48,18 +30,6 @@
       "name": "publish-research-site",
       "source": "./plugins/publish-research-site",
       "description": "将研究主题转化为带引用、图像和交互体验的网站并部署到 Vercel。",
-      "version": "1.0.0"
-    },
-    {
-      "name": "lab-interpreter",
-      "source": "./plugins/lab-interpreter",
-      "description": "解读医疗化验单、体检报告、血液/尿液/肝肾功能等检查结果。",
-      "version": "1.0.0"
-    },
-    {
-      "name": "emergency-triage",
-      "source": "./plugins/emergency-triage",
-      "description": "中文急诊分诊和症状排查助手，给出挂号科室与检查建议。",
       "version": "1.0.0"
     },
     {
