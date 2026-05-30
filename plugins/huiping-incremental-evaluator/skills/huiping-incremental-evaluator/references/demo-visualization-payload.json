@@ -1,0 +1,227 @@
+{
+  "demo_case": {
+    "course_name": "储能系统检测与估计",
+    "report_topic": "基于循环实验数据的锂离子电池容量衰减与 SOH 估计分析",
+    "student_id": "demo-student-01",
+    "scenario": "初稿到终稿的课程报告增量评价演示"
+  },
+  "visualization_payload": {
+    "material_check": {
+      "completeness_score": 86,
+      "items": [
+        {
+          "name": "初稿",
+          "status": "available",
+          "confidence": 0.98
+        },
+        {
+          "name": "终稿",
+          "status": "available",
+          "confidence": 0.99
+        },
+        {
+          "name": "课程评分标准",
+          "status": "available",
+          "confidence": 0.9
+        },
+        {
+          "name": "代码附件",
+          "status": "missing",
+          "confidence": 0.35,
+          "impact": "数据分析深度评分置信度下降"
+        },
+        {
+          "name": "参考文献列表",
+          "status": "available",
+          "confidence": 0.88
+        }
+      ],
+      "risks": [
+        "未提供代码附件，数据分析能力判断主要基于报告文本和图表说明",
+        "终稿语言流畅度提升明显，建议答辩追问核心方法理解"
+      ]
+    },
+    "draft_delta_map": {
+      "sections": [
+        {
+          "name": "研究背景",
+          "initial_words": 320,
+          "final_words": 520,
+          "delta_type": "expanded"
+        },
+        {
+          "name": "文献综述",
+          "initial_words": 210,
+          "final_words": 610,
+          "delta_type": "substantially_improved"
+        },
+        {
+          "name": "数据分析",
+          "initial_words": 460,
+          "final_words": 980,
+          "delta_type": "substantially_improved"
+        },
+        {
+          "name": "结果讨论",
+          "initial_words": 260,
+          "final_words": 640,
+          "delta_type": "strengthened"
+        },
+        {
+          "name": "结论",
+          "initial_words": 180,
+          "final_words": 430,
+          "delta_type": "strengthened"
+        }
+      ],
+      "key_additions": [
+        {
+          "section": "数据分析",
+          "summary": "新增容量衰减趋势曲线、误差对比和异常循环说明"
+        },
+        {
+          "section": "文献综述",
+          "summary": "补充 SOC/SOH 估计相关文献并解释方法选择依据"
+        },
+        {
+          "section": "结果讨论",
+          "summary": "新增估计误差来源分析和模型适用边界说明"
+        }
+      ]
+    },
+    "six_dimension_scores": {
+      "dimensions": [
+        {
+          "name": "创新性",
+          "initial": 68,
+          "final": 80,
+          "delta": 12,
+          "evidence": "选题从泛泛讨论电池老化转向具体循环实验数据下的 SOH 估计场景"
+        },
+        {
+          "name": "数据分析深度",
+          "initial": 55,
+          "final": 82,
+          "delta": 27,
+          "evidence": "终稿新增趋势曲线、误差分析、异常点解释和结果讨论"
+        },
+        {
+          "name": "完整性",
+          "initial": 70,
+          "final": 88,
+          "delta": 18,
+          "evidence": "补齐方法、实验结果、讨论、结论和参考文献"
+        },
+        {
+          "name": "文献引用",
+          "initial": 58,
+          "final": 76,
+          "delta": 18,
+          "evidence": "终稿新增课程相关文献，并将引用用于解释 SOH 估计方法"
+        },
+        {
+          "name": "结论合理性",
+          "initial": 62,
+          "final": 84,
+          "delta": 22,
+          "evidence": "结论从概括性判断变为基于误差和曲线变化的证据化表述"
+        },
+        {
+          "name": "格式规范性",
+          "initial": 78,
+          "final": 90,
+          "delta": 12,
+          "evidence": "图表编号、章节层级和参考文献格式明显改善"
+        }
+      ],
+      "overall": {
+        "initial": 65,
+        "final": 83,
+        "delta": 18
+      }
+    },
+    "expert_panel": {
+      "experts": [
+        {
+          "name": "领域知识专家",
+          "score": 86,
+          "confidence": 0.92,
+          "view": "SOC、SOH、容量衰减等核心概念使用较准确，课程相关性较强"
+        },
+        {
+          "name": "数据分析专家",
+          "score": 81,
+          "confidence": 0.78,
+          "view": "分析路线明显增强，但缺少代码附件支撑可复现性判断"
+        },
+        {
+          "name": "文献导读专家",
+          "score": 77,
+          "confidence": 0.84,
+          "view": "引用数量和相关性提升，但文献之间的对比仍可加强"
+        },
+        {
+          "name": "文档质控专家",
+          "score": 88,
+          "confidence": 0.9,
+          "view": "结构完整，图表说明清晰度较初稿明显提升"
+        },
+        {
+          "name": "创新性评审专家",
+          "score": 79,
+          "confidence": 0.84,
+          "view": "选题有场景化改进，但方法创新主要体现在应用分析层面"
+        }
+      ],
+      "consensus": "终稿相比初稿有显著提升，主要体现在数据分析深度、报告完整性和结论合理性",
+      "disagreements": [
+        "数据分析专家因缺少代码附件给出较低置信度",
+        "创新性评审专家认为方法创新有限，更多是场景化应用创新"
+      ]
+    },
+    "growth_evidence_chain": {
+      "growth_points": [
+        {
+          "ability": "数据分析能力",
+          "delta": 27,
+          "evidence_before": "初稿仅描述数据来源，缺少实验设计和误差分析",
+          "evidence_after": "终稿加入容量衰减曲线、误差对比、异常点解释和结果讨论",
+          "authenticity_signal": "medium_high"
+        },
+        {
+          "ability": "文献理解能力",
+          "delta": 18,
+          "evidence_before": "引用较少，且与方法选择关联弱",
+          "evidence_after": "新增 SOC/SOH 估计文献，并用于解释分析路线",
+          "authenticity_signal": "medium"
+        },
+        {
+          "ability": "结论表达能力",
+          "delta": 22,
+          "evidence_before": "结论偏泛化，缺少数据支撑",
+          "evidence_after": "结论能对应曲线趋势、误差表现和模型适用条件",
+          "authenticity_signal": "medium_high"
+        }
+      ],
+      "ai_assistance_risks": [
+        "语言流畅度提升明显，不宜仅凭终稿文字质量判断学生理解",
+        "建议通过课堂答辩追问 SOH 指标、误差来源和异常循环解释"
+      ]
+    },
+    "evaluation_report": {
+      "teacher_comment": "该报告终稿相比初稿在数据分析深度、结构完整性和结论合理性方面提升明显。学生能够围绕循环实验数据补充容量衰减趋势、误差分析和结果解释，体现出对课程核心概念的进一步理解。建议补充代码说明或关键参数设置，以增强结果可复现性。",
+      "student_reflection_questions": [
+        "你在终稿中新增的数据分析结果如何支撑 SOH 估计结论？",
+        "容量衰减曲线中的异常点可能来自哪些实验或数据因素？",
+        "哪些修改来自你自己的理解深化，哪些来自 AI 辅助建议？",
+        "如果补充代码附件，你会如何说明关键参数和复现实验步骤？"
+      ],
+      "recommended_grade_band": "良好-优秀",
+      "next_feedback_actions": [
+        "要求学生补充代码或关键计算步骤说明",
+        "答辩中追问误差分析依据和异常循环解释",
+        "鼓励学生进一步比较不同 SOH 估计方法的适用边界"
+      ]
+    }
+  }
+}

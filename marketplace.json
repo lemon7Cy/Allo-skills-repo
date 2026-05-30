@@ -97,6 +97,36 @@
       "source": "./plugins/mingxue-kb-query",
       "description": "查询明雪知识库，面向电池、SOC、SOH、RUL、Kalman、BMS 和储能问题，并返回带出处的检索答案。",
       "version": "1.0.0"
+    },
+    {
+      "name": "huiping-incremental-evaluator",
+      "source": "./plugins/huiping-incremental-evaluator",
+      "description": "课程报告初稿与终稿增量评价，输出六维评分、专家评价、成长证据链和可视化 JSON。",
+      "version": "1.0.0"
+    },
+    {
+      "name": "huiping-report-review",
+      "source": "./plugins/huiping-report-review",
+      "description": "审查课程报告结构、逻辑、格式、图表、引用和语言质量，输出报告体检结果。",
+      "version": "1.0.0"
+    },
+    {
+      "name": "huiping-data-analysis-coach",
+      "source": "./plugins/huiping-data-analysis-coach",
+      "description": "辅导和评价课程报告中的数据分析设计、图表解释、代码说明和实验结论。",
+      "version": "1.0.0"
+    },
+    {
+      "name": "huiping-literature-guide",
+      "source": "./plugins/huiping-literature-guide",
+      "description": "基于明学知识库进行文献导读、课程知识梳理、引用质量审查和阅读路径推荐。",
+      "version": "1.0.0"
+    },
+    {
+      "name": "huiping-topic-advisor",
+      "source": "./plugins/huiping-topic-advisor",
+      "description": "面向课程报告进行选题挖掘、创新性评估、可行性分析和数据资源匹配。",
+      "version": "1.0.0"
     }
   ]
 }
