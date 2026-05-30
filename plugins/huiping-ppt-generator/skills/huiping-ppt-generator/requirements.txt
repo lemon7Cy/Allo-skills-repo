@@ -1,0 +1,47 @@
+# PPT Master Dependencies / PPT Master 依赖
+# =============================================
+# Based on https://github.com/hugohe3/ppt-master
+#
+# Install: pip install -r requirements.txt
+#
+# Core: python-pptx for PPTX export
+# Most other tools use Python standard library
+
+# ── SVG to PPTX ──────────────────────────────────────────────
+python-pptx>=0.6.21
+
+# ── PDF to Markdown ──────────────────────────────────────────
+PyMuPDF>=1.23.0
+
+# ── Document to Markdown (DOCX/HTML/EPUB/IPYNB) ─────────────
+mammoth>=1.6.0
+markdownify>=0.11.6
+ebooklib>=0.18
+nbconvert>=7.0.0
+
+# ── Excel to Markdown ────────────────────────────────────────
+openpyxl>=3.1.0
+
+# ── Image processing ─────────────────────────────────────────
+Pillow>=9.0.0
+numpy>=1.20.0
+
+# ── Web to Markdown ──────────────────────────────────────────
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+
+# ── Office compatibility (SVG→PNG fallback) ──────────────────
+svglib>=1.5.0
+reportlab>=4.0.0
+
+# ── Recorded narration ───────────────────────────────────────
+edge-tts>=7.2.8
+
+# ── AI image generation (Gemini backend) ─────────────────────
+google-genai>=1.0.0
+
+# ── SVG Editor ───────────────────────────────────────────────
+flask>=3.0.0
+
+# ── Optional: WeChat / TLS fingerprint bypass ────────────────
+# curl_cffi>=0.7.0

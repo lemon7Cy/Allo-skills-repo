@@ -127,6 +127,18 @@
       "source": "./plugins/huiping-topic-advisor",
       "description": "面向课程报告进行选题挖掘、创新性评估、可行性分析和数据资源匹配。",
       "version": "1.0.0"
+    },
+    {
+      "name": "huiping-html-deck",
+      "source": "./plugins/huiping-html-deck",
+      "description": "生成课程报告演示用的横向翻页网页 PPT（单文件 HTML），支持杂志风和瑞士国际主义风格。基于 guizang-ppt-skill 改造。",
+      "version": "1.0.0"
+    },
+    {
+      "name": "huiping-ppt-generator",
+      "source": "./plugins/huiping-ppt-generator",
+      "description": "AI 驱动的课程报告 PPT 生成器，将文档/数据转换为原生可编辑的 .pptx 文件，支持动画和 speaker notes。基于 ppt-master 改造。",
+      "version": "1.0.0"
     }
   ]
 }
