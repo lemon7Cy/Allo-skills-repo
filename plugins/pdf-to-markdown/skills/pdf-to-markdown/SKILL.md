@@ -6,8 +6,6 @@ tools: []
 
 # PDF 转 Markdown
 
-> 来源: 基于 [processing-pdf-to-markdown](https://github.com/anthropics/claude-code-skills) 改造，适配慧评课程报告场景。
-
 ## 这个 Skill 做什么
 
 通过 PDF Parse API 将 PDF 转换为 Markdown，支持：
@@ -16,17 +14,14 @@ tools: []
 - 📦 **MinerU 归档** — 保留图片、表格、布局资产
 - 🔍 **RAG 就绪** — 输出可直接用于知识库检索
 
-## API 配置
+## API 配置（必须）
 
-```text
-Base URL: http://221.0.79.251:18090
-Default token: AHBi8g-Faeo4PbB6X7KBnBaBYXVE4WKLe1pdR2Cw0VA
-Header: Authorization: Bearer AHBi8g-Faeo4PbB6X7KBnBaBYXVE4WKLe1pdR2Cw0VA
+使用前必须设置环境变量：
+
+```bash
+export PDF_PARSE_BASE_URL="http://<your-server>:<port>"
+export PDF_PARSE_TOKEN="<your-token>"
 ```
-
-优先使用环境变量 `PDF_PARSE_BASE_URL` 和 `PDF_PARSE_TOKEN`（如果已配置）。未配置时使用上述默认值，确保 skill 安装即可用。
-
-**安全规则**：不要将此 token 提交到项目代码、前端代码、截图或生成的公开文档中——除非用户明确要求。
 
 ## 端点选择
 
@@ -50,16 +45,6 @@ curl -sS -X POST "$PDF_PARSE_BASE_URL/pdf/markdown" \
   > output.md
 ```
 
-环境变量未配置时，使用内置默认值：
-
-```bash
-curl -sS -X POST "http://221.0.79.251:18090/pdf/markdown" \
-  -H "Authorization: Bearer AHBi8g-Faeo4PbB6X7KBnBaBYXVE4WKLe1pdR2Cw0VA" \
-  -F "file=@/path/to/input.pdf" \
-  | python3 -c 'import sys,json; print(json.load(sys.stdin)["markdown"])' \
-  > output.md
-```
-
 验证：输出文件存在、非空、包含预期标题/表格。
 
 ## 异步模式（大 PDF）
@@ -70,8 +55,6 @@ curl -sS -X POST "$PDF_PARSE_BASE_URL/pdf/jobs" \
   -H "Authorization: Bearer $PDF_PARSE_TOKEN" \
   -F "file=@/path/to/input.pdf"
 ```
-
-环境变量未配置时，将 `$PDF_PARSE_BASE_URL` 替换为 `http://221.0.79.251:18090`，`$PDF_PARSE_TOKEN` 替换为上方 Service Defaults 中的默认 token。
 
 **轮询状态**：
 ```bash
@@ -151,15 +134,6 @@ mingxue-kb-query → 基于 Markdown 内容查询知识库
 huiping-incremental-evaluator → 基于内容生成六维评分
 huiping-ppt-generator → 基于内容生成演示稿
 ```
-
-## API Keys
-
-| 环境变量 | 用途 | 必须 |
-|----------|------|------|
-| `PDF_PARSE_BASE_URL` | PDF Parse API 地址 | 否（有内置默认值） |
-| `PDF_PARSE_TOKEN` | API 认证 token | 否（有内置默认值） |
-
-未配置环境变量时，skill 使用内置默认值，安装即可用。
 
 ## 资源文件
 

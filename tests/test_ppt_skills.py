@@ -220,8 +220,6 @@ class TestPdfToMarkdown(unittest.TestCase):
             content = f.read()
         self.assertIn("PDF_PARSE_BASE_URL", content)
         self.assertIn("PDF_PARSE_TOKEN", content)
-        self.assertIn("AHBi8g-Faeo4PbB6X7KBnBaBYXVE4WKLe1pdR2Cw0VA", content)
-        self.assertIn("221.0.79.251:18090", content)
 
     def test_skill_md_has_endpoints(self):
         with open(PDF2MD_SKILL_PATH, "r", encoding="utf-8") as f:

@@ -18,67 +18,51 @@ tools: []
 
 **不要用于**：明学电池/SOC/SOH/RUL/Kalman 问题（用 `mingxue-kb-query`）
 
+## 环境变量配置（必须）
+
+使用前必须设置以下环境变量：
+
+```bash
+export DONGFANG_SSH_HOST="<ssh-user>@<server-ip>"   # e.g. user@10.0.0.1
+export DONGFANG_SSH_PORT="<ssh-port>"                # e.g. 10022
+export DONGFANG_WEB_UI="http://<server-ip>:<port>"   # Web Agentic Search UI
+```
+
 ## 查询命令
 
 使用远程东方查询包装器。不要对东方问题调用明学包装器。
 
 ```bash
-ssh -p 10022 -o ConnectTimeout=10 songjin@221.0.79.251 '~/bin/dongfang-query-remote "QUESTION" --top-k 5 --mode answer --json'
+ssh -p $DONGFANG_SSH_PORT -o ConnectTimeout=10 $DONGFANG_SSH_HOST '~/bin/dongfang-query-remote "QUESTION" --top-k 5 --mode answer --json'
 ```
 
 获取更广泛证据：
 
 ```bash
-ssh -p 10022 -o ConnectTimeout=10 songjin@221.0.79.251 '~/bin/dongfang-query-remote "QUESTION" --top-k 8 --mode answer --json'
+ssh -p $DONGFANG_SSH_PORT -o ConnectTimeout=10 $DONGFANG_SSH_HOST '~/bin/dongfang-query-remote "QUESTION" --top-k 8 --mode answer --json'
 ```
 
 文献/参考式探索（东方材料内）：
 
 ```bash
-ssh -p 10022 -o ConnectTimeout=10 songjin@221.0.79.251 '~/bin/dongfang-query-remote "QUESTION" --top-k 5 --mode research --json'
+ssh -p $DONGFANG_SSH_PORT -o ConnectTimeout=10 $DONGFANG_SSH_HOST '~/bin/dongfang-query-remote "QUESTION" --top-k 5 --mode research --json'
 ```
 
-包装器使用标准化远程查询服务：
-
-```text
-/mnt/hdd6t1/dongfang_query_proxy
-```
-
-远程主机上的服务管理命令：
-
-```bash
-/mnt/hdd6t1/dongfang_query_proxy/status.sh
-/mnt/hdd6t1/dongfang_query_proxy/start.sh
-/mnt/hdd6t1/dongfang_query_proxy/stop.sh
-/mnt/hdd6t1/dongfang_query_proxy/restart.sh
-/mnt/hdd6t1/dongfang_query_proxy/smoke.sh "东方电子有哪些配电自动化产品？"
-```
-
-查询失败时使用 `status.sh` 或 `smoke.sh` 检查。不要打印 `/mnt/hdd6t1/dongfang_query_proxy/query.env`（包含凭据/token）。
+查询失败时使用远程主机上的 `status.sh` 或 `smoke.sh` 检查服务状态。
 
 ## Web / Agentic Search
 
-东方电子公开 Agentic Search UI：
-
-```text
-http://221.0.79.251:18093
-```
-
-UI 支持证据搜索和 Agentic Search QA。Agentic Search 执行独立问题重写、首轮检索、证据评估、可选跟进检索、证据合并和最终引用答案。
+配置 `$DONGFANG_WEB_UI` 后访问 Agentic Search UI。UI 支持证据搜索和 Agentic Search QA，包括独立问题重写、首轮检索、证据评估、可选跟进检索、证据合并和最终引用答案。
 
 ## 数据集信息
 
-- 主数据集：`dongfang-business-v1`
-- 主数据集 ID：`4604b1105b7311f189f0cb2e8883de1f`
-- 资产数据集：`dongfang-assets-shadow-v1`
-- 资产数据集 ID：`693b40cc5b7311f189f0cb2e8883de1f`
-- 查询代理：远程服务器 `127.0.0.1:18100`
-- 查询服务根目录：`/mnt/hdd6t1/dongfang_query_proxy`
-- 远程 CLI 包装器：`~/bin/dongfang-query-remote`
-- 公共 Web 前端：远程服务器 `0.0.0.0:18093`
-- 源运行根目录：`/mnt/hdd6t1/dongfang_kb/runs/20260529-dongfang-full`
+以下信息由管理员配置，不要暴露凭据或 token，不要打印 env 文件：
 
-不要暴露凭据或 token。不要打印 env 文件。只引用返回的 chunks/assets。
+- 主数据集：`dongfang-business-v1`
+- 资产数据集：`dongfang-assets-shadow-v1`
+- 远程 CLI 包装器：`~/bin/dongfang-query-remote`
+
+只引用返回的 chunks/assets。
 
 ## 查询规划
 
