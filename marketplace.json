@@ -139,6 +139,12 @@
       "source": "./plugins/huiping-ppt-generator",
       "description": "AI 驱动的课程报告 PPT 生成器，将文档/数据转换为原生可编辑的 .pptx 文件，支持动画和 speaker notes。基于 ppt-master 改造。",
       "version": "1.0.0"
+    },
+    {
+      "name": "pdf-to-markdown",
+      "source": "./plugins/pdf-to-markdown",
+      "description": "将 PDF 文件转换为 Markdown，支持同步/异步模式、图片/表格保留、RAG 归档。通过 PDF Parse API 实现。",
+      "version": "1.0.0"
     }
   ]
 }

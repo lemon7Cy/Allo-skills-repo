@@ -63,6 +63,15 @@ PPT_GEN_REQ_PATH = os.path.join(
     "requirements.txt",
 )
 
+PDF2MD_SKILL_PATH = os.path.join(
+    REPO_ROOT,
+    "plugins",
+    "pdf-to-markdown",
+    "skills",
+    "pdf-to-markdown",
+    "SKILL.md",
+)
+
 
 class TestHuipingHtmlDeck(unittest.TestCase):
     def test_skill_md_exists(self):
@@ -185,6 +194,37 @@ class TestHuipingPptGenerator(unittest.TestCase):
         with open(PPT_GEN_SKILL_PATH, "r", encoding="utf-8") as f:
             content = f.read()
         self.assertIn(".env", content)
+
+
+class TestPdfToMarkdown(unittest.TestCase):
+    def test_skill_md_exists(self):
+        self.assertTrue(os.path.exists(PDF2MD_SKILL_PATH))
+
+    def test_skill_md_has_frontmatter(self):
+        with open(PDF2MD_SKILL_PATH, "r", encoding="utf-8") as f:
+            content = f.read()
+        self.assertTrue(content.startswith("---"))
+        self.assertIn("name: pdf-to-markdown", content)
+
+    def test_skill_md_has_api_config(self):
+        with open(PDF2MD_SKILL_PATH, "r", encoding="utf-8") as f:
+            content = f.read()
+        self.assertIn("PDF_PARSE_BASE_URL", content)
+        self.assertIn("PDF_PARSE_TOKEN", content)
+
+    def test_skill_md_has_endpoints(self):
+        with open(PDF2MD_SKILL_PATH, "r", encoding="utf-8") as f:
+            content = f.read()
+        self.assertIn("/pdf/markdown", content)
+        self.assertIn("/pdf/jobs", content)
+        self.assertIn("/archive", content)
+
+    def test_skill_registered_in_marketplace(self):
+        marketplace_path = os.path.join(REPO_ROOT, "marketplace.json")
+        with open(marketplace_path, "r", encoding="utf-8") as f:
+            marketplace = json.load(f)
+        plugin_names = {p["name"] for p in marketplace["plugins"]}
+        self.assertIn("pdf-to-markdown", plugin_names)
 
 
 class TestPptSkillsInMarketplace(unittest.TestCase):
