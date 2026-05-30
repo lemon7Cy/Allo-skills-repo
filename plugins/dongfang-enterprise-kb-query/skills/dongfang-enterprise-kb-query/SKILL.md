@@ -8,7 +8,7 @@ tools: []
 
 ## 这个 Skill 做什么
 
-使用独立的东方电子 RAGFlow 知识库回答企业/业务材料问题。**不要**将东方电子问题路由到明学知识库；明学是独立的电池/SOC/SOH 学术知识库。
+使用东方电子 RAGFlow 知识库 HTTP API 进行检索。**不要**将东方电子问题路由到明学知识库；明学是独立的电池/SOC/SOH 学术知识库。
 
 ## 何时使用
 
@@ -23,46 +23,27 @@ tools: []
 使用前必须设置以下环境变量：
 
 ```bash
-export DONGFANG_SSH_HOST="<ssh-user>@<server-ip>"   # e.g. user@10.0.0.1
-export DONGFANG_SSH_PORT="<ssh-port>"                # e.g. 10022
-export DONGFANG_WEB_UI="http://<server-ip>:<port>"   # Web Agentic Search UI
+export DONGFANG_API_URL="http://<server>:<port>/api/search"
+export DONGFANG_API_TOKEN="<your-token>"
 ```
 
-## 查询命令
-
-使用远程东方查询包装器。不要对东方问题调用明学包装器。
+## 检索命令（search）
 
 ```bash
-ssh -p $DONGFANG_SSH_PORT -o ConnectTimeout=10 $DONGFANG_SSH_HOST '~/bin/dongfang-query-remote "QUESTION" --top-k 5 --mode answer --json'
+curl -sS -X POST "$DONGFANG_API_URL" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $DONGFANG_API_TOKEN" \
+  -d '{"question": "QUESTION", "top_k": 5}'
 ```
 
-获取更广泛证据：
+参数说明：
+- `question`：检索问题（必填）
+- `top_k`：返回结果数量（默认 5，广泛证据用 8）
+- `mode`：`answer`（默认）或 `research`（文献发现）
 
-```bash
-ssh -p $DONGFANG_SSH_PORT -o ConnectTimeout=10 $DONGFANG_SSH_HOST '~/bin/dongfang-query-remote "QUESTION" --top-k 8 --mode answer --json'
-```
+## 问答命令（ask，可选）
 
-文献/参考式探索（东方材料内）：
-
-```bash
-ssh -p $DONGFANG_SSH_PORT -o ConnectTimeout=10 $DONGFANG_SSH_HOST '~/bin/dongfang-query-remote "QUESTION" --top-k 5 --mode research --json'
-```
-
-查询失败时使用远程主机上的 `status.sh` 或 `smoke.sh` 检查服务状态。
-
-## Web / Agentic Search
-
-配置 `$DONGFANG_WEB_UI` 后访问 Agentic Search UI。UI 支持证据搜索和 Agentic Search QA，包括独立问题重写、首轮检索、证据评估、可选跟进检索、证据合并和最终引用答案。
-
-## 数据集信息
-
-以下信息由管理员配置，不要暴露凭据或 token，不要打印 env 文件：
-
-- 主数据集：`dongfang-business-v1`
-- 资产数据集：`dongfang-assets-shadow-v1`
-- 远程 CLI 包装器：`~/bin/dongfang-query-remote`
-
-只引用返回的 chunks/assets。
+Ask API 需要额外配置 LLM 环境变量，未配置时不可用。优先使用 search API。
 
 ## 查询规划
 
@@ -87,7 +68,7 @@ ssh -p $DONGFANG_SSH_PORT -o ConnectTimeout=10 $DONGFANG_SSH_HOST '~/bin/dongfan
 
 返回：
 1. 简短结论
-2. 基于证据的解释（仅使用返回的 `chunks` 和 `assets`）
+2. 基于证据的解释（仅使用返回的 `chunks`）
 3. 来源列表：`rank`、`document`、`section_type`、`similarity`
 4. 资产来源列表（有用时）：`asset_id`、`asset_type`、`source_doc`、`similarity`
 
@@ -101,11 +82,11 @@ ssh -p $DONGFANG_SSH_PORT -o ConnectTimeout=10 $DONGFANG_SSH_HOST '~/bin/dongfan
 
 ## 常见错误
 
-- 对东方问题使用 `mingxue-query-remote` → 用 `dongfang-query-remote`
+- 对东方问题使用 mingxue API → 用东方电子 API
 - 用户要求知识库答案时先调用公开 Web 搜索
 - 将通用微电网场景当作东方特有（无返回证据时）
-- 声称图片细节（除非资产元数据或 VLM 摘要明确支持）
-- 打印 API keys、查询 tokens、env 文件或 RAGFlow 凭据
+- 声称图片细节（除非资产元数据明确支持）
+- 打印 API keys、查询 tokens 或 RAGFlow 凭据
 
 ## 与其他慧评 Skill 的配合
 
@@ -116,12 +97,3 @@ dongfang-enterprise-kb-query → 查询企业知识库
        ↓
 带出处的答案 → 用于课程报告、研究、方案设计
 ```
-
-## 资源文件
-
-```
-dongfang-enterprise-kb-query/
-└── SKILL.md ← 你正在读
-```
-
-本 skill 是远程 SSH 查询，无本地脚本依赖。

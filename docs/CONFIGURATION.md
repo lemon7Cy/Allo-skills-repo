@@ -6,8 +6,8 @@
 
 | Skill | 必须配置 | 可选配置 | 状态 |
 |-------|----------|----------|------|
-| `mingxue-kb-query` | SSH 连接 | — | ⚠️ 需配置 |
-| `dongfang-enterprise-kb-query` | SSH 连接、Web UI | — | ⚠️ 需配置 |
+| `mingxue-kb-query` | API URL、Token | — | ⚠️ 需配置 |
+| `dongfang-enterprise-kb-query` | API URL、Token | — | ⚠️ 需配置 |
 | `pdf-to-markdown` | API URL、Token | — | ⚠️ 需配置 |
 | `huiping-ppt-generator` | — | AI 图片生成 API | 🔵 可选 |
 | `huiping-incremental-evaluator` | — | — | ✅ 开箱即用 |
@@ -22,35 +22,33 @@
 
 ### 1. mingxue-kb-query（明学知识库查询）
 
-通过 SSH 查询明学 RAGFlow 知识库。
+通过 HTTP API 查询明学 RAGFlow 知识库。
 
 ```bash
-export MINGXUE_SSH_HOST="<ssh-user>@<server-ip>"
-export MINGXUE_SSH_PORT="<ssh-port>"
+export MINGXUE_API_URL="http://<server>:<port>/api/search"
+export MINGXUE_API_TOKEN="<your-token>"
 ```
 
-| 变量 | 说明 | 示例 |
-|------|------|------|
-| `MINGXUE_SSH_HOST` | SSH 用户@服务器地址 | `user@10.0.0.1` |
-| `MINGXUE_SSH_PORT` | SSH 端口 | `10022` |
+| 变量 | 说明 |
+|------|------|
+| `MINGXUE_API_URL` | 明学 Search API 地址 |
+| `MINGXUE_API_TOKEN` | API 认证 token |
 
 ---
 
 ### 2. dongfang-enterprise-kb-query（东方电子企业知识库查询）
 
-通过 SSH 查询东方电子 RAGFlow 知识库。
+通过 HTTP API 查询东方电子 RAGFlow 知识库。
 
 ```bash
-export DONGFANG_SSH_HOST="<ssh-user>@<server-ip>"
-export DONGFANG_SSH_PORT="<ssh-port>"
-export DONGFANG_WEB_UI="http://<server-ip>:<port>"
+export DONGFANG_API_URL="http://<server>:<port>/api/search"
+export DONGFANG_API_TOKEN="<your-token>"
 ```
 
-| 变量 | 说明 | 示例 |
-|------|------|------|
-| `DONGFANG_SSH_HOST` | SSH 用户@服务器地址 | `user@10.0.0.1` |
-| `DONGFANG_SSH_PORT` | SSH 端口 | `10022` |
-| `DONGFANG_WEB_UI` | Web Agentic Search UI 地址 | `http://10.0.0.1:18093` |
+| 变量 | 说明 |
+|------|------|
+| `DONGFANG_API_URL` | 东方电子 Search API 地址 |
+| `DONGFANG_API_TOKEN` | API 认证 token |
 
 ---
 
@@ -63,10 +61,10 @@ export PDF_PARSE_BASE_URL="http://<server>:<port>"
 export PDF_PARSE_TOKEN="<your-token>"
 ```
 
-| 变量 | 说明 | 示例 |
-|------|------|------|
-| `PDF_PARSE_BASE_URL` | PDF Parse API 地址 | `http://10.0.0.1:18090` |
-| `PDF_PARSE_TOKEN` | API 认证 token | （向管理员获取） |
+| 变量 | 说明 |
+|------|------|
+| `PDF_PARSE_BASE_URL` | PDF Parse API 地址 |
+| `PDF_PARSE_TOKEN` | API 认证 token |
 
 ---
 
@@ -99,11 +97,10 @@ cp plugins/huiping-ppt-generator/skills/huiping-ppt-generator/.env.example \
 
 ```bash
 # Allo Skills 配置
-export MINGXUE_SSH_HOST="..."
-export MINGXUE_SSH_PORT="..."
-export DONGFANG_SSH_HOST="..."
-export DONGFANG_SSH_PORT="..."
-export DONGFANG_WEB_UI="..."
+export MINGXUE_API_URL="..."
+export MINGXUE_API_TOKEN="..."
+export DONGFANG_API_URL="..."
+export DONGFANG_API_TOKEN="..."
 export PDF_PARSE_BASE_URL="..."
 export PDF_PARSE_TOKEN="..."
 ```
@@ -118,6 +115,6 @@ export PDF_PARSE_TOKEN="..."
 
 ## 安全提醒
 
-- 不要将 token、key、SSH 凭据提交到 git 仓库
+- 不要将 token、key 提交到 git 仓库
 - 不要在 SKILL.md 或代码中硬编码敏感信息
 - 使用环境变量管理所有凭据

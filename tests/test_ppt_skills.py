@@ -249,12 +249,12 @@ class TestDongfangKbQuery(unittest.TestCase):
     def test_skill_md_has_query_command(self):
         with open(DONGFANG_SKILL_PATH, "r", encoding="utf-8") as f:
             content = f.read()
-        self.assertIn("dongfang-query-remote", content)
+        self.assertIn("DONGFANG_API_URL", content)
 
     def test_skill_md_has_dataset_info(self):
         with open(DONGFANG_SKILL_PATH, "r", encoding="utf-8") as f:
             content = f.read()
-        self.assertIn("dongfang-business-v1", content)
+        self.assertIn("DONGFANG_API_TOKEN", content)
 
     def test_skill_registered_in_marketplace(self):
         marketplace_path = os.path.join(REPO_ROOT, "marketplace.json")
