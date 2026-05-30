@@ -72,6 +72,15 @@ PDF2MD_SKILL_PATH = os.path.join(
     "SKILL.md",
 )
 
+DONGFANG_SKILL_PATH = os.path.join(
+    REPO_ROOT,
+    "plugins",
+    "dongfang-enterprise-kb-query",
+    "skills",
+    "dongfang-enterprise-kb-query",
+    "SKILL.md",
+)
+
 
 class TestHuipingHtmlDeck(unittest.TestCase):
     def test_skill_md_exists(self):
@@ -227,6 +236,34 @@ class TestPdfToMarkdown(unittest.TestCase):
             marketplace = json.load(f)
         plugin_names = {p["name"] for p in marketplace["plugins"]}
         self.assertIn("pdf-to-markdown", plugin_names)
+
+
+class TestDongfangKbQuery(unittest.TestCase):
+    def test_skill_md_exists(self):
+        self.assertTrue(os.path.exists(DONGFANG_SKILL_PATH))
+
+    def test_skill_md_has_frontmatter(self):
+        with open(DONGFANG_SKILL_PATH, "r", encoding="utf-8") as f:
+            content = f.read()
+        self.assertTrue(content.startswith("---"))
+        self.assertIn("name: dongfang-enterprise-kb-query", content)
+
+    def test_skill_md_has_query_command(self):
+        with open(DONGFANG_SKILL_PATH, "r", encoding="utf-8") as f:
+            content = f.read()
+        self.assertIn("dongfang-query-remote", content)
+
+    def test_skill_md_has_dataset_info(self):
+        with open(DONGFANG_SKILL_PATH, "r", encoding="utf-8") as f:
+            content = f.read()
+        self.assertIn("dongfang-business-v1", content)
+
+    def test_skill_registered_in_marketplace(self):
+        marketplace_path = os.path.join(REPO_ROOT, "marketplace.json")
+        with open(marketplace_path, "r", encoding="utf-8") as f:
+            marketplace = json.load(f)
+        plugin_names = {p["name"] for p in marketplace["plugins"]}
+        self.assertIn("dongfang-enterprise-kb-query", plugin_names)
 
 
 class TestPptSkillsInMarketplace(unittest.TestCase):

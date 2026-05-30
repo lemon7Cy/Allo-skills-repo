@@ -145,6 +145,12 @@
       "source": "./plugins/pdf-to-markdown",
       "description": "将 PDF 文件转换为 Markdown，支持同步/异步模式、图片/表格保留、RAG 归档。通过 PDF Parse API 实现。",
       "version": "1.0.0"
+    },
+    {
+      "name": "dongfang-enterprise-kb-query",
+      "source": "./plugins/dongfang-enterprise-kb-query",
+      "description": "查询东方电子企业知识库，面向配电、调度云化、储能新能源、微电网、综合能源、虚拟电厂等业务场景，返回带出处的检索答案。",
+      "version": "1.0.0"
     }
   ]
 }
