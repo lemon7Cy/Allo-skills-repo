@@ -14,12 +14,15 @@ tools: []
 - 📦 **MinerU 归档** — 保留图片、表格、布局资产
 - 🔍 **RAG 就绪** — 输出可直接用于知识库检索
 
-## API 配置（必须）
+## API 配置
 
-使用前必须设置环境变量：
+```text
+Base URL: http://221.0.79.251:18090
+```
+
+Token 通过环境变量传入：
 
 ```bash
-export PDF_PARSE_BASE_URL="http://<your-server>:<port>"
 export PDF_PARSE_TOKEN="<your-token>"
 ```
 
@@ -38,7 +41,7 @@ export PDF_PARSE_TOKEN="<your-token>"
 ## 同步模式（小 PDF）
 
 ```bash
-curl -sS -X POST "$PDF_PARSE_BASE_URL/pdf/markdown" \
+curl -sS -X POST "http://221.0.79.251:18090/pdf/markdown" \
   -H "Authorization: Bearer $PDF_PARSE_TOKEN" \
   -F "file=@/path/to/input.pdf" \
   | python3 -c 'import sys,json; print(json.load(sys.stdin)["markdown"])' \
@@ -51,7 +54,7 @@ curl -sS -X POST "$PDF_PARSE_BASE_URL/pdf/markdown" \
 
 **提交任务**：
 ```bash
-curl -sS -X POST "$PDF_PARSE_BASE_URL/pdf/jobs" \
+curl -sS -X POST "http://221.0.79.251:18090/pdf/jobs" \
   -H "Authorization: Bearer $PDF_PARSE_TOKEN" \
   -F "file=@/path/to/input.pdf"
 ```
@@ -59,20 +62,20 @@ curl -sS -X POST "$PDF_PARSE_BASE_URL/pdf/jobs" \
 **轮询状态**：
 ```bash
 curl -sS -H "Authorization: Bearer $PDF_PARSE_TOKEN" \
-  "$PDF_PARSE_BASE_URL/pdf/jobs/<job_id>"
+  "http://221.0.79.251:18090/pdf/jobs/<job_id>"
 ```
 
 **下载 Markdown**：
 ```bash
 curl -sS -H "Authorization: Bearer $PDF_PARSE_TOKEN" \
-  "$PDF_PARSE_BASE_URL/pdf/jobs/<job_id>/markdown" \
+  "http://221.0.79.251:18090/pdf/jobs/<job_id>/markdown" \
   -o output.md
 ```
 
 **下载归档（需要资产时）**：
 ```bash
 curl -sS -H "Authorization: Bearer $PDF_PARSE_TOKEN" \
-  "$PDF_PARSE_BASE_URL/pdf/jobs/<job_id>/archive" \
+  "http://221.0.79.251:18090/pdf/jobs/<job_id>/archive" \
   -o mineru_output.zip
 ```
 

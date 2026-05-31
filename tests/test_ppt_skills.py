@@ -218,8 +218,8 @@ class TestPdfToMarkdown(unittest.TestCase):
     def test_skill_md_has_api_config(self):
         with open(PDF2MD_SKILL_PATH, "r", encoding="utf-8") as f:
             content = f.read()
-        self.assertIn("PDF_PARSE_BASE_URL", content)
         self.assertIn("PDF_PARSE_TOKEN", content)
+        self.assertIn("221.0.79.251", content)
 
     def test_skill_md_has_endpoints(self):
         with open(PDF2MD_SKILL_PATH, "r", encoding="utf-8") as f:
@@ -249,12 +249,12 @@ class TestDongfangKbQuery(unittest.TestCase):
     def test_skill_md_has_query_command(self):
         with open(DONGFANG_SKILL_PATH, "r", encoding="utf-8") as f:
             content = f.read()
-        self.assertIn("DONGFANG_API_URL", content)
+        self.assertIn("DONGFANG_API_TOKEN", content)
 
     def test_skill_md_has_dataset_info(self):
         with open(DONGFANG_SKILL_PATH, "r", encoding="utf-8") as f:
             content = f.read()
-        self.assertIn("DONGFANG_API_TOKEN", content)
+        self.assertIn("18093", content)
 
     def test_skill_registered_in_marketplace(self):
         marketplace_path = os.path.join(REPO_ROOT, "marketplace.json")

@@ -18,19 +18,23 @@ tools: []
 
 不要用于通用编码任务或与此知识库无关的问题。
 
-## 环境变量配置（必须）
+## API 配置
 
-使用前必须设置以下环境变量：
+```text
+Search API: http://221.0.79.251:18091/api/search
+Ask API:    http://221.0.79.251:18091/api/ask  (需额外配置 LLM)
+```
+
+Token 通过环境变量传入：
 
 ```bash
-export MINGXUE_API_URL="http://<server>:<port>/api/search"
 export MINGXUE_API_TOKEN="<your-token>"
 ```
 
 ## 检索命令（search）
 
 ```bash
-curl -sS -X POST "$MINGXUE_API_URL" \
+curl -sS -X POST "http://221.0.79.251:18091/api/search" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $MINGXUE_API_TOKEN" \
   -d '{"question": "QUESTION", "top_k": 5}'
@@ -75,17 +79,17 @@ Ask API 需要额外配置 LLM 环境变量（`MINGXUE_LLM_BASE`、`MINGXUE_LLM_
 更好的证据查询（拆分为聚焦查询）：
 
 ```bash
-curl -sS -X POST "$MINGXUE_API_URL" \
+curl -sS -X POST "http://221.0.79.251:18091/api/search" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $MINGXUE_API_TOKEN" \
   -d '{"question": "锂离子电池循环实验数据分析 SOC SOH 容量衰减 库仑效率 能量效率", "top_k": 4}'
 
-curl -sS -X POST "$MINGXUE_API_URL" \
+curl -sS -X POST "http://221.0.79.251:18091/api/search" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $MINGXUE_API_TOKEN" \
   -d '{"question": "锂离子电池老化 内阻 容量衰减 SOH RUL 循环寿命", "top_k": 4}'
 
-curl -sS -X POST "$MINGXUE_API_URL" \
+curl -sS -X POST "http://221.0.79.251:18091/api/search" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $MINGXUE_API_TOKEN" \
   -d '{"question": "SOC估计 OCV 安时积分 卡尔曼滤波 锂离子电池", "top_k": 4}'

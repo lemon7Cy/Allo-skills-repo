@@ -18,19 +18,23 @@ tools: []
 
 **不要用于**：明学电池/SOC/SOH/RUL/Kalman 问题（用 `mingxue-kb-query`）
 
-## 环境变量配置（必须）
+## API 配置
 
-使用前必须设置以下环境变量：
+```text
+Search API: http://221.0.79.251:18093/api/search
+Ask API:    http://221.0.79.251:18093/api/ask  (需额外配置 LLM)
+```
+
+Token 通过环境变量传入：
 
 ```bash
-export DONGFANG_API_URL="http://<server>:<port>/api/search"
 export DONGFANG_API_TOKEN="<your-token>"
 ```
 
 ## 检索命令（search）
 
 ```bash
-curl -sS -X POST "$DONGFANG_API_URL" \
+curl -sS -X POST "http://221.0.79.251:18093/api/search" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $DONGFANG_API_TOKEN" \
   -d '{"question": "QUESTION", "top_k": 5}'
