@@ -2,6 +2,35 @@
 name: huiping-ppt-generator
 description: AI 驱动的课程报告 PPT 生成器，将文档/数据转换为原生可编辑的 .pptx 文件。支持多角色协作、SVG 内容生成、动画和 speaker notes。当用户需要生成正式的、可在 PowerPoint 中编辑的课程报告 PPT 时使用。基于 ppt-master 改造。
 tools: []
+version: "1.0.0"
+author: allo-official
+required_env: []
+optional_env:
+  - OPENAI_API_KEY
+  - GEMINI_API_KEY
+  - PEXELS_API_KEY
+  - PIXABAY_API_KEY
+credentials:
+  - key: OPENAI_API_KEY
+    label: OpenAI API Key
+    description: 用于 AI 图片生成（gpt-image-2）。不配置则使用占位图。
+    required: false
+    secret: true
+  - key: GEMINI_API_KEY
+    label: Gemini API Key
+    description: 用于 Gemini 图片生成（备选后端）。
+    required: false
+    secret: true
+  - key: PEXELS_API_KEY
+    label: Pexels API Key
+    description: 用于 Pexels 图片搜索（免费申请：https://www.pexels.com/api/）。
+    required: false
+    secret: true
+  - key: PIXABAY_API_KEY
+    label: Pixabay API Key
+    description: 用于 Pixabay 图片搜索（免费申请：https://pixabay.com/api/docs/）。
+    required: false
+    secret: true
 ---
 
 # 慧评 PPT 生成器

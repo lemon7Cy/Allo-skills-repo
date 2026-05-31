@@ -96,7 +96,20 @@
       "name": "mingxue-kb-query",
       "source": "./plugins/mingxue-kb-query",
       "description": "查询明雪知识库，面向电池、SOC、SOH、RUL、Kalman、BMS 和储能问题，并返回带出处的检索答案。",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "category": "research",
+      "tags": ["battery", "knowledge-base", "soc", "soh"],
+      "required_env": ["MINGXUE_API_TOKEN"],
+      "optional_env": [],
+      "credentials": [
+        {
+          "key": "MINGXUE_API_TOKEN",
+          "label": "明学知识库 API Token",
+          "description": "用于查询明学 RAGFlow 知识库的认证 token。",
+          "required": true,
+          "secret": true
+        }
+      ]
     },
     {
       "name": "huiping-incremental-evaluator",
@@ -138,19 +151,79 @@
       "name": "huiping-ppt-generator",
       "source": "./plugins/huiping-ppt-generator",
       "description": "AI 驱动的课程报告 PPT 生成器，将文档/数据转换为原生可编辑的 .pptx 文件，支持动画和 speaker notes。基于 ppt-master 改造。",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "category": "presentation",
+      "tags": ["ppt", "pptx", "presentation", "course-report"],
+      "required_env": [],
+      "optional_env": ["OPENAI_API_KEY", "GEMINI_API_KEY", "PEXELS_API_KEY", "PIXABAY_API_KEY"],
+      "credentials": [
+        {
+          "key": "OPENAI_API_KEY",
+          "label": "OpenAI API Key",
+          "description": "用于 AI 图片生成（gpt-image-2）。不配置则使用占位图。",
+          "required": false,
+          "secret": true
+        },
+        {
+          "key": "GEMINI_API_KEY",
+          "label": "Gemini API Key",
+          "description": "用于 Gemini 图片生成（备选后端）。",
+          "required": false,
+          "secret": true
+        },
+        {
+          "key": "PEXELS_API_KEY",
+          "label": "Pexels API Key",
+          "description": "用于 Pexels 图片搜索（免费申请：https://www.pexels.com/api/）。",
+          "required": false,
+          "secret": true
+        },
+        {
+          "key": "PIXABAY_API_KEY",
+          "label": "Pixabay API Key",
+          "description": "用于 Pixabay 图片搜索（免费申请：https://pixabay.com/api/docs/）。",
+          "required": false,
+          "secret": true
+        }
+      ]
     },
     {
       "name": "pdf-to-markdown",
       "source": "./plugins/pdf-to-markdown",
       "description": "将 PDF 文件转换为 Markdown，支持同步/异步模式、图片/表格保留、RAG 归档。通过 PDF Parse API 实现。",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "category": "productivity",
+      "tags": ["pdf", "markdown", "conversion", "rag"],
+      "required_env": ["PDF_PARSE_TOKEN"],
+      "optional_env": [],
+      "credentials": [
+        {
+          "key": "PDF_PARSE_TOKEN",
+          "label": "PDF Parse API Token",
+          "description": "用于调用 PDF Parse API 将 PDF 转换为 Markdown 的认证 token。",
+          "required": true,
+          "secret": true
+        }
+      ]
     },
     {
       "name": "dongfang-enterprise-kb-query",
       "source": "./plugins/dongfang-enterprise-kb-query",
       "description": "查询东方电子企业知识库，面向配电、调度云化、储能新能源、微电网、综合能源、虚拟电厂等业务场景，返回带出处的检索答案。",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "category": "research",
+      "tags": ["dongfang", "enterprise", "knowledge-base", "power-grid"],
+      "required_env": ["DONGFANG_API_TOKEN"],
+      "optional_env": [],
+      "credentials": [
+        {
+          "key": "DONGFANG_API_TOKEN",
+          "label": "东方电子知识库 API Token",
+          "description": "用于查询东方电子 RAGFlow 知识库的认证 token。",
+          "required": true,
+          "secret": true
+        }
+      ]
     }
   ]
 }

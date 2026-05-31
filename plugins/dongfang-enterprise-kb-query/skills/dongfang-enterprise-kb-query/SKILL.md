@@ -2,6 +2,17 @@
 name: dongfang-enterprise-kb-query
 description: 查询东方电子企业知识库，面向配电、调度云化、储能新能源、微电网、综合能源、虚拟电厂、智慧城市、港口、石油石化等业务场景，并返回带出处的检索答案。当用户提到东方、东方电子、企业知识库或相关业务场景时使用。
 tools: []
+version: "1.0.0"
+author: allo-official
+required_env:
+  - DONGFANG_API_TOKEN
+optional_env: []
+credentials:
+  - key: DONGFANG_API_TOKEN
+    label: 东方电子知识库 API Token
+    description: 用于查询东方电子 RAGFlow 知识库的认证 token。
+    required: true
+    secret: true
 ---
 
 # 东方电子企业知识库查询

@@ -6,101 +6,82 @@
 
 | Skill | 必须配置 | 可选配置 | 状态 |
 |-------|----------|----------|------|
-| `mingxue-kb-query` | API Token | — | ⚠️ 需配置 |
-| `dongfang-enterprise-kb-query` | API Token | — | ⚠️ 需配置 |
-| `pdf-to-markdown` | API Token | — | ⚠️ 需配置 |
-| `huiping-ppt-generator` | — | AI 图片生成 API | 🔵 可选 |
-| `huiping-incremental-evaluator` | — | — | ✅ 开箱即用 |
-| `huiping-report-review` | — | — | ✅ 开箱即用 |
-| `huiping-data-analysis-coach` | — | — | ✅ 开箱即用 |
-| `huiping-literature-guide` | — | — | ✅ 开箱即用 |
-| `huiping-topic-advisor` | — | — | ✅ 开箱即用 |
-| `huiping-html-deck` | — | — | ✅ 开箱即用 |
-| 其他 15 个通用 skills | — | — | ✅ 开箱即用 |
+| `mingxue-kb-query` | `MINGXUE_API_TOKEN` | — | ⚠️ 需配置 |
+| `dongfang-enterprise-kb-query` | `DONGFANG_API_TOKEN` | — | ⚠️ 需配置 |
+| `pdf-to-markdown` | `PDF_PARSE_TOKEN` | — | ⚠️ 需配置 |
+| `huiping-ppt-generator` | — | `OPENAI_API_KEY` 等 | 🔵 可选 |
+| 其他 20 个 skills | — | — | ✅ 开箱即用 |
 
-## 详细配置
+## 凭据管理方式
+
+Allo Desktop 通过 `settings.json` 管理 skill 凭据，**不依赖环境变量**：
+
+```json
+{
+  "credentials": {
+    "skills": {
+      "mingxue-kb-query": {
+        "MINGXUE_API_TOKEN": "..."
+      },
+      "dongfang-enterprise-kb-query": {
+        "DONGFANG_API_TOKEN": "..."
+      },
+      "pdf-to-markdown": {
+        "PDF_PARSE_TOKEN": "..."
+      }
+    }
+  }
+}
+```
+
+每个 skill 的 `SKILL.md` frontmatter 和 `marketplace.json` 都声明了 `required_env`/`optional_env`/`credentials`，Allo Desktop 会自动检查状态：
+- 无声明的 key → `not_configurable`
+- 有 required key 未配置 → `missing_required_credentials`
+- required 已配、optional 未配 → `missing_optional_credentials`
+- 全部就绪 → `ready`
+
+## 需要配置的 Skills
 
 ### 1. mingxue-kb-query（明学知识库查询）
 
-API 地址已内置，只需配置 Token。
+| Key | 说明 | 必须 |
+|-----|------|------|
+| `MINGXUE_API_TOKEN` | 明学 RAGFlow 知识库认证 token | ✅ |
 
-```bash
-export MINGXUE_API_TOKEN="<your-token>"
-```
-
-| 变量 | 说明 |
-|------|------|
-| `MINGXUE_API_TOKEN` | 明学 API 认证 token |
+API 地址已内置：`http://221.0.79.251:18091`
 
 ---
 
 ### 2. dongfang-enterprise-kb-query（东方电子企业知识库查询）
 
-API 地址已内置，只需配置 Token。
+| Key | 说明 | 必须 |
+|-----|------|------|
+| `DONGFANG_API_TOKEN` | 东方电子 RAGFlow 知识库认证 token | ✅ |
 
-```bash
-export DONGFANG_API_TOKEN="<your-token>"
-```
-
-| 变量 | 说明 |
-|------|------|
-| `DONGFANG_API_TOKEN` | 东方电子 API 认证 token |
+API 地址已内置：`http://221.0.79.251:18093`
 
 ---
 
 ### 3. pdf-to-markdown（PDF 转 Markdown）
 
-API 地址已内置，只需配置 Token。
+| Key | 说明 | 必须 |
+|-----|------|------|
+| `PDF_PARSE_TOKEN` | PDF Parse API 认证 token | ✅ |
 
-```bash
-export PDF_PARSE_TOKEN="<your-token>"
-```
-
-| 变量 | 说明 |
-|------|------|
-| `PDF_PARSE_TOKEN` | PDF Parse API 认证 token |
+API 地址已内置：`http://221.0.79.251:18090`
 
 ---
 
 ### 4. huiping-ppt-generator（PPT 生成器，可选）
 
-默认可使用，如需 AI 图片生成能力需配置：
-
-```bash
-# 复制环境变量模板
-cp plugins/huiping-ppt-generator/skills/huiping-ppt-generator/.env.example \
-   plugins/huiping-ppt-generator/skills/huiping-ppt-generator/.env
-```
-
-| 变量 | 说明 | 必须 |
-|------|------|------|
-| `IMAGE_BACKEND` | 图片生成后端 | 否（默认 `openai`） |
-| `OPENAI_API_KEY` | OpenAI API Key（gpt-image-2） | 推荐 |
-| `OPENAI_BASE_URL` | OpenAI API 地址 | 否（默认官方） |
-| `GEMINI_API_KEY` | Gemini API Key（备选） | 可选 |
+| Key | 说明 | 必须 |
+|-----|------|------|
+| `OPENAI_API_KEY` | OpenAI API Key（gpt-image-2 图片生成） | 可选 |
+| `GEMINI_API_KEY` | Gemini API Key（备选图片生成） | 可选 |
 | `PEXELS_API_KEY` | Pexels 图片搜索（免费申请） | 可选 |
 | `PIXABAY_API_KEY` | Pixabay 图片搜索（免费申请） | 可选 |
 
----
-
-## 配置方式
-
-### 方式一：Shell profile（推荐）
-
-在 `~/.zshrc` 或 `~/.bashrc` 中添加：
-
-```bash
-# Allo Skills 配置
-export MINGXUE_API_TOKEN="..."
-export DONGFANG_API_TOKEN="..."
-export PDF_PARSE_TOKEN="..."
-```
-
-然后 `source ~/.zshrc` 生效。
-
-### 方式二：项目级 .env
-
-在项目根目录创建 `.env` 文件（已在 `.gitignore` 中）。
+不配置任何 key 也能使用，图片部分会用占位图。
 
 ---
 
@@ -108,4 +89,4 @@ export PDF_PARSE_TOKEN="..."
 
 - 不要将 token、key 提交到 git 仓库
 - 不要在 SKILL.md 或代码中硬编码 token
-- 使用环境变量管理所有凭据
+- Allo Desktop 自动管理凭据存储

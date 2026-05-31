@@ -2,6 +2,17 @@
 name: mingxue-kb-query
 description: 查询明雪知识库，面向电池、SOC、SOH、RUL、Kalman、EKF、UKF、BMS、储能问题，并返回带出处的检索答案。
 tools: []
+version: "1.0.0"
+author: allo-official
+required_env:
+  - MINGXUE_API_TOKEN
+optional_env: []
+credentials:
+  - key: MINGXUE_API_TOKEN
+    label: 明学知识库 API Token
+    description: 用于查询明学 RAGFlow 知识库的认证 token。
+    required: true
+    secret: true
 ---
 
 # 明学知识库查询

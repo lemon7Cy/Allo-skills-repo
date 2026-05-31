@@ -2,6 +2,17 @@
 name: pdf-to-markdown
 description: 将 PDF 文件转换为 Markdown，支持同步/异步模式、图片/表格保留、RAG 归档。当用户需要转换 PDF 为 Markdown、处理 MinerU 归档、保留图片表格、或为 RAG 准备解析后的 PDF 输出时使用。
 tools: []
+version: "1.0.0"
+author: allo-official
+required_env:
+  - PDF_PARSE_TOKEN
+optional_env: []
+credentials:
+  - key: PDF_PARSE_TOKEN
+    label: PDF Parse API Token
+    description: 用于调用 PDF Parse API 将 PDF 转换为 Markdown 的认证 token。
+    required: true
+    secret: true
 ---
 
 # PDF 转 Markdown
