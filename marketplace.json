@@ -155,33 +155,12 @@
       "category": "presentation",
       "tags": ["ppt", "pptx", "presentation", "course-report"],
       "required_env": [],
-      "optional_env": ["OPENAI_API_KEY", "GEMINI_API_KEY", "PEXELS_API_KEY", "PIXABAY_API_KEY"],
+      "optional_env": ["GPT_IMAGE_API_KEY"],
       "credentials": [
         {
-          "key": "OPENAI_API_KEY",
-          "label": "OpenAI API Key",
-          "description": "用于 AI 图片生成（gpt-image-2）。不配置则使用占位图。",
-          "required": false,
-          "secret": true
-        },
-        {
-          "key": "GEMINI_API_KEY",
-          "label": "Gemini API Key",
-          "description": "用于 Gemini 图片生成（备选后端）。",
-          "required": false,
-          "secret": true
-        },
-        {
-          "key": "PEXELS_API_KEY",
-          "label": "Pexels API Key",
-          "description": "用于 Pexels 图片搜索（免费申请：https://www.pexels.com/api/）。",
-          "required": false,
-          "secret": true
-        },
-        {
-          "key": "PIXABAY_API_KEY",
-          "label": "Pixabay API Key",
-          "description": "用于 Pixabay 图片搜索（免费申请：https://pixabay.com/api/docs/）。",
+          "key": "GPT_IMAGE_API_KEY",
+          "label": "GPT Image 2 API Key",
+          "description": "用于 AI 图片生成（gpt-image-2）。不配置则使用占位图。API 地址已内置。",
           "required": false,
           "secret": true
         }

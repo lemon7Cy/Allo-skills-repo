@@ -6,29 +6,11 @@ version: "1.0.0"
 author: allo-official
 required_env: []
 optional_env:
-  - OPENAI_API_KEY
-  - GEMINI_API_KEY
-  - PEXELS_API_KEY
-  - PIXABAY_API_KEY
+  - GPT_IMAGE_API_KEY
 credentials:
-  - key: OPENAI_API_KEY
-    label: OpenAI API Key
-    description: 用于 AI 图片生成（gpt-image-2）。不配置则使用占位图。
-    required: false
-    secret: true
-  - key: GEMINI_API_KEY
-    label: Gemini API Key
-    description: 用于 Gemini 图片生成（备选后端）。
-    required: false
-    secret: true
-  - key: PEXELS_API_KEY
-    label: Pexels API Key
-    description: 用于 Pexels 图片搜索（免费申请：https://www.pexels.com/api/）。
-    required: false
-    secret: true
-  - key: PIXABAY_API_KEY
-    label: Pixabay API Key
-    description: 用于 Pixabay 图片搜索（免费申请：https://pixabay.com/api/docs/）。
+  - key: GPT_IMAGE_API_KEY
+    label: GPT Image 2 API Key
+    description: 用于 AI 图片生成（gpt-image-2）。不配置则使用占位图。API 地址已内置。
     required: false
     secret: true
 ---
@@ -47,10 +29,13 @@ bash <SKILL_ROOT>/setup.sh
 
 该脚本会 sparse clone 上游仓库，拉取 scripts、references、templates 并安装 Python 依赖。
 
-如需 AI 图片生成，还需配置环境变量：
+如需 AI 图片生成，配置 API Key（可选，不配置也能用）：
+
 ```bash
-cp <SKILL_ROOT>/.env.example <SKILL_ROOT>/.env
-# 编辑 .env 设置 OPENAI_API_KEY
+export GPT_IMAGE_API_KEY="<your-key>"
+```
+
+API 地址已内置：`http://221.0.79.251:8088/v1`（gpt-image-2）
 
 ## 这个 Skill 做什么
 

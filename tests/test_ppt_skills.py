@@ -179,7 +179,7 @@ class TestHuipingPptGenerator(unittest.TestCase):
         self.assertTrue(os.path.exists(PPT_GEN_ENV_PATH))
         with open(PPT_GEN_ENV_PATH, "r", encoding="utf-8") as f:
             content = f.read()
-        self.assertIn("OPENAI_API_KEY", content)
+        self.assertIn("GPT_IMAGE_API_KEY", content)
 
     def test_requirements_txt_exists(self):
         self.assertTrue(os.path.exists(PPT_GEN_REQ_PATH))

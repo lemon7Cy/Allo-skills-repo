@@ -76,12 +76,11 @@ API 地址已内置：`http://221.0.79.251:18090`
 
 | Key | 说明 | 必须 |
 |-----|------|------|
-| `OPENAI_API_KEY` | OpenAI API Key（gpt-image-2 图片生成） | 可选 |
-| `GEMINI_API_KEY` | Gemini API Key（备选图片生成） | 可选 |
-| `PEXELS_API_KEY` | Pexels 图片搜索（免费申请） | 可选 |
-| `PIXABAY_API_KEY` | Pixabay 图片搜索（免费申请） | 可选 |
+| `GPT_IMAGE_API_KEY` | GPT Image 2 API Key（图片生成） | 可选 |
 
-不配置任何 key 也能使用，图片部分会用占位图。
+API 地址已内置：`http://221.0.79.251:8088/v1`（gpt-image-2）
+
+不配置也能使用，图片部分会用占位图。
 
 ---
 
