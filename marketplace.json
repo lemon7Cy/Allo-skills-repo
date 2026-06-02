@@ -98,8 +98,15 @@
       "description": "查询明雪知识库，面向电池、SOC、SOH、RUL、Kalman、BMS 和储能问题，并返回带出处的检索答案。",
       "version": "1.0.0",
       "category": "research",
-      "tags": ["battery", "knowledge-base", "soc", "soh"],
-      "required_env": ["MINGXUE_API_TOKEN"],
+      "tags": [
+        "battery",
+        "knowledge-base",
+        "soc",
+        "soh"
+      ],
+      "required_env": [
+        "MINGXUE_API_TOKEN"
+      ],
       "optional_env": [],
       "credentials": [
         {
@@ -153,9 +160,16 @@
       "description": "AI 驱动的课程报告 PPT 生成器，将文档/数据转换为原生可编辑的 .pptx 文件，支持动画和 speaker notes。基于 ppt-master 改造。",
       "version": "1.0.0",
       "category": "presentation",
-      "tags": ["ppt", "pptx", "presentation", "course-report"],
+      "tags": [
+        "ppt",
+        "pptx",
+        "presentation",
+        "course-report"
+      ],
       "required_env": [],
-      "optional_env": ["GPT_IMAGE_API_KEY"],
+      "optional_env": [
+        "GPT_IMAGE_API_KEY"
+      ],
       "credentials": [
         {
           "key": "GPT_IMAGE_API_KEY",
@@ -172,8 +186,15 @@
       "description": "将 PDF 文件转换为 Markdown，支持同步/异步模式、图片/表格保留、RAG 归档。通过 PDF Parse API 实现。",
       "version": "1.0.0",
       "category": "productivity",
-      "tags": ["pdf", "markdown", "conversion", "rag"],
-      "required_env": ["PDF_PARSE_TOKEN"],
+      "tags": [
+        "pdf",
+        "markdown",
+        "conversion",
+        "rag"
+      ],
+      "required_env": [
+        "PDF_PARSE_TOKEN"
+      ],
       "optional_env": [],
       "credentials": [
         {
@@ -191,8 +212,15 @@
       "description": "查询东方电子企业知识库，面向配电、调度云化、储能新能源、微电网、综合能源、虚拟电厂等业务场景，返回带出处的检索答案。",
       "version": "1.0.0",
       "category": "research",
-      "tags": ["dongfang", "enterprise", "knowledge-base", "power-grid"],
-      "required_env": ["DONGFANG_API_TOKEN"],
+      "tags": [
+        "dongfang",
+        "enterprise",
+        "knowledge-base",
+        "power-grid"
+      ],
+      "required_env": [
+        "DONGFANG_API_TOKEN"
+      ],
       "optional_env": [],
       "credentials": [
         {
@@ -203,6 +231,125 @@
           "secret": true
         }
       ]
+    },
+    {
+      "name": "deep-research",
+      "description": "Systematic multi-angle web research that replaces superficial single searches with thorough methodology.",
+      "version": "1.0.0",
+      "category": "research",
+      "built_in": true
+    },
+    {
+      "name": "data-analysis",
+      "description": "Perform data analysis on Excel/CSV files including statistics, pivot tables, SQL queries, and aggregation.",
+      "version": "1.0.0",
+      "category": "data",
+      "built_in": true
+    },
+    {
+      "name": "chart-visualization",
+      "description": "Intelligently select the best chart type from 26 options and generate a chart image.",
+      "version": "1.0.0",
+      "category": "data",
+      "built_in": true
+    },
+    {
+      "name": "frontend-design",
+      "description": "Create distinctive, production-grade frontend interfaces, dashboards, and web components.",
+      "version": "1.0.0",
+      "category": "coding",
+      "built_in": true
+    },
+    {
+      "name": "consulting-analysis",
+      "description": "Generate professional research reports (market analysis, financial analysis, competitive intelligence, etc.).",
+      "version": "1.0.0",
+      "category": "research",
+      "built_in": true
+    },
+    {
+      "name": "image-generation",
+      "description": "Generate or visualize images using structured prompts and reference images.",
+      "version": "1.0.0",
+      "category": "creative",
+      "built_in": true
+    },
+    {
+      "name": "podcast-generation",
+      "description": "Convert text content into a two-host conversational podcast audio format.",
+      "version": "1.0.0",
+      "category": "creative",
+      "built_in": true
+    },
+    {
+      "name": "ppt-generation",
+      "description": "Create AI-generated presentation slides in PPTX format with visual consistency.",
+      "version": "1.0.0",
+      "category": "creative",
+      "built_in": true
+    },
+    {
+      "name": "video-generation",
+      "description": "Generate or imagine videos using structured prompts and reference images.",
+      "version": "1.0.0",
+      "category": "creative",
+      "built_in": true
+    },
+    {
+      "name": "github-deep-research",
+      "description": "Conduct multi-round deep research on any GitHub repo with structured reports and Mermaid diagrams.",
+      "version": "1.0.0",
+      "category": "research",
+      "built_in": true
+    },
+    {
+      "name": "find-skills",
+      "description": "Help users discover and install agent skills for extending capabilities.",
+      "version": "1.0.0",
+      "category": "general",
+      "built_in": true
+    },
+    {
+      "name": "skill-creator",
+      "description": "Create, modify, and benchmark agent skills including optimization and evaluation.",
+      "version": "1.0.0",
+      "category": "coding",
+      "built_in": true
+    },
+    {
+      "name": "surprise-me",
+      "description": "Dynamically discover and creatively combine other skills for a delightful experience.",
+      "version": "1.0.0",
+      "category": "general",
+      "built_in": true
+    },
+    {
+      "name": "tdli-style-slides",
+      "description": "Create TDLI-branded presentation slides with PDF and PPTX output.",
+      "version": "1.0.0",
+      "category": "creative",
+      "built_in": true
+    },
+    {
+      "name": "vercel-deploy-claimable",
+      "description": "Deploy apps and websites to Vercel with preview URL and claimable deployment link.",
+      "version": "1.0.0",
+      "category": "coding",
+      "built_in": true
+    },
+    {
+      "name": "web-design-guidelines",
+      "description": "Review UI code for web interface guidelines compliance, accessibility, and UX best practices.",
+      "version": "1.0.0",
+      "category": "coding",
+      "built_in": true
+    },
+    {
+      "name": "bootstrap",
+      "description": "Generate a personalized SOUL.md through a warm, adaptive onboarding conversation.",
+      "version": "1.0.0",
+      "category": "general",
+      "built_in": true
     }
   ]
 }
