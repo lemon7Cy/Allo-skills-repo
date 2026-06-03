@@ -237,119 +237,132 @@
       "description": "Systematic multi-angle web research that replaces superficial single searches with thorough methodology.",
       "version": "1.0.0",
       "category": "research",
-      "built_in": true
+      "source": "./plugins/deep-research"
     },
     {
       "name": "data-analysis",
       "description": "Perform data analysis on Excel/CSV files including statistics, pivot tables, SQL queries, and aggregation.",
       "version": "1.0.0",
       "category": "data",
-      "built_in": true
+      "source": "./plugins/data-analysis"
     },
     {
       "name": "chart-visualization",
       "description": "Intelligently select the best chart type from 26 options and generate a chart image.",
       "version": "1.0.0",
       "category": "data",
-      "built_in": true
+      "source": "./plugins/chart-visualization"
     },
     {
       "name": "frontend-design",
       "description": "Create distinctive, production-grade frontend interfaces, dashboards, and web components.",
       "version": "1.0.0",
       "category": "coding",
-      "built_in": true
+      "source": "./plugins/frontend-design"
     },
     {
       "name": "consulting-analysis",
       "description": "Generate professional research reports (market analysis, financial analysis, competitive intelligence, etc.).",
       "version": "1.0.0",
       "category": "research",
-      "built_in": true
+      "source": "./plugins/consulting-analysis"
     },
     {
       "name": "image-generation",
       "description": "Generate or visualize images using structured prompts and reference images.",
       "version": "1.0.0",
       "category": "creative",
-      "built_in": true
+      "source": "./plugins/image-generation"
     },
     {
       "name": "podcast-generation",
       "description": "Convert text content into a two-host conversational podcast audio format.",
       "version": "1.0.0",
       "category": "creative",
-      "built_in": true
+      "source": "./plugins/podcast-generation",
+      "required_env": [
+        "VOLCENGINE_TTS_ACCESS_TOKEN"
+      ],
+      "optional_env": [],
+      "credentials": [
+        {
+          "key": "VOLCENGINE_TTS_ACCESS_TOKEN",
+          "label": "火山引擎 TTS Access Token",
+          "description": "用于语音合成生成播客音频的认证 token。",
+          "required": true,
+          "secret": true
+        }
+      ]
     },
     {
       "name": "ppt-generation",
       "description": "Create AI-generated presentation slides in PPTX format with visual consistency.",
       "version": "1.0.0",
       "category": "creative",
-      "built_in": true
+      "source": "./plugins/ppt-generation"
     },
     {
       "name": "video-generation",
       "description": "Generate or imagine videos using structured prompts and reference images.",
       "version": "1.0.0",
       "category": "creative",
-      "built_in": true
+      "source": "./plugins/video-generation"
     },
     {
       "name": "github-deep-research",
       "description": "Conduct multi-round deep research on any GitHub repo with structured reports and Mermaid diagrams.",
       "version": "1.0.0",
       "category": "research",
-      "built_in": true
+      "source": "./plugins/github-deep-research"
     },
     {
       "name": "find-skills",
       "description": "Help users discover and install agent skills for extending capabilities.",
       "version": "1.0.0",
       "category": "general",
-      "built_in": true
+      "source": "./plugins/find-skills"
     },
     {
       "name": "skill-creator",
       "description": "Create, modify, and benchmark agent skills including optimization and evaluation.",
       "version": "1.0.0",
       "category": "coding",
-      "built_in": true
+      "source": "./plugins/skill-creator"
     },
     {
       "name": "surprise-me",
       "description": "Dynamically discover and creatively combine other skills for a delightful experience.",
       "version": "1.0.0",
       "category": "general",
-      "built_in": true
+      "source": "./plugins/surprise-me"
     },
     {
       "name": "tdli-style-slides",
       "description": "Create TDLI-branded presentation slides with PDF and PPTX output.",
       "version": "1.0.0",
       "category": "creative",
-      "built_in": true
+      "source": "./plugins/tdli-style-slides"
     },
     {
       "name": "vercel-deploy-claimable",
       "description": "Deploy apps and websites to Vercel with preview URL and claimable deployment link.",
       "version": "1.0.0",
       "category": "coding",
-      "built_in": true
+      "source": "./plugins/vercel-deploy-claimable"
     },
     {
       "name": "web-design-guidelines",
       "description": "Review UI code for web interface guidelines compliance, accessibility, and UX best practices.",
       "version": "1.0.0",
       "category": "coding",
-      "built_in": true
+      "source": "./plugins/web-design-guidelines"
     },
     {
       "name": "bootstrap",
       "description": "Generate a personalized SOUL.md through a warm, adaptive onboarding conversation.",
       "version": "1.0.0",
       "category": "general",
-      "built_in": true
+      "source": "./plugins/bootstrap"
     }
   ]
 }
