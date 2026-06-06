@@ -269,10 +269,23 @@
     },
     {
       "name": "image-generation",
-      "description": "Generate or visualize images using structured prompts and reference images.",
-      "version": "1.0.0",
+      "description": "Generate or edit images via MaaS platform gpt-image-2 API, supporting text-to-image and image editing.",
+      "version": "2.0.0",
       "category": "creative",
-      "source": "./plugins/image-generation"
+      "source": "./plugins/image-generation",
+      "required_env": [
+        "GPT_IMAGE_API_KEY"
+      ],
+      "optional_env": [],
+      "credentials": [
+        {
+          "key": "GPT_IMAGE_API_KEY",
+          "label": "GPT Image 2 API Key",
+          "description": "用于调用 MaaS 平台 gpt-image-2 生图和编辑接口的认证 key。",
+          "required": true,
+          "secret": true
+        }
+      ]
     },
     {
       "name": "podcast-generation",

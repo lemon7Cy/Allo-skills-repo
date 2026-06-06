@@ -11,7 +11,11 @@ Generate or edit images via the MaaS platform using `gpt-image-2`. Supports text
 
 ## Runtime Paths
 
+The Agent context should provide the absolute path to this `SKILL.md`. Derive bundled files from that path instead of using fixed virtual mount paths:
+
 ```bash
+SKILL_DIR="$(cd "$(dirname "$SKILL_MD_PATH")" && pwd)"
+WORKSPACE_DIR="${WORKSPACE_DIR:-$PWD/workspace}"
 OUTPUT_DIR="${OUTPUT_DIR:-$PWD/outputs}"
 UPLOAD_DIR="${UPLOAD_DIR:-$PWD/uploads}"
 ```
@@ -52,7 +56,7 @@ When a user requests image generation, identify:
 
 ```bash
 curl -s http://221.0.79.251:8080/v1/images/generations \
-  -H "Authorization: Bearer $API_KEY" \
+  -H "Authorization: Bearer $GPT_IMAGE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "model": "gpt-image-2",
@@ -69,7 +73,7 @@ curl -s http://221.0.79.251:8080/v1/images/generations \
 
 ```bash
 curl -s http://221.0.79.251:8080/v1/images/edits \
-  -H "Authorization: Bearer $API_KEY" \
+  -H "Authorization: Bearer $GPT_IMAGE_API_KEY" \
   -F "image=@$UPLOAD_DIR/input.png" \
   -F "prompt=YOUR_EDIT_PROMPT" \
   -F "model=gpt-image-2"
@@ -81,7 +85,7 @@ Decode `b64_json` response and save:
 
 ```bash
 RESPONSE=$(curl -s http://221.0.79.251:8080/v1/images/generations \
-  -H "Authorization: Bearer $API_KEY" \
+  -H "Authorization: Bearer $GPT_IMAGE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"model":"gpt-image-2","prompt":"A cute cat","response_format":"b64_json"}')
 
