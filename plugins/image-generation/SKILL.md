@@ -1,6 +1,18 @@
 ---
 name: image-generation
 description: Use this skill when the user requests to generate, create, imagine, or visualize images including characters, scenes, products, or any visual content. Supports text-to-image and image editing via MaaS platform gpt-image-2 API.
+tools: []
+version: "2.0.0"
+author: allo-official
+required_env:
+  - GPT_IMAGE_API_KEY
+optional_env: []
+credentials:
+  - key: GPT_IMAGE_API_KEY
+    label: GPT Image 2 API Key
+    description: 用于调用 MaaS 平台 gpt-image-2 生图和编辑接口的认证 key。
+    required: true
+    secret: true
 ---
 
 # Image Generation Skill
