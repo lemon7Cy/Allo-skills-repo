@@ -288,6 +288,26 @@
       ]
     },
     {
+      "name": "maas-observability",
+      "description": "查询 MaaS 平台可观测性数据：总览、模型用量、Provider/Pool 统计和系统健康。",
+      "version": "1.0.0",
+      "category": "research",
+      "source": "./plugins/maas-observability",
+      "required_env": [
+        "MAAS_ADMIN_API_KEY"
+      ],
+      "optional_env": [],
+      "credentials": [
+        {
+          "key": "MAAS_ADMIN_API_KEY",
+          "label": "MaaS Admin API Key",
+          "description": "MaaS 平台 Admin 后台的 admin_api_key，用于查询可观测性接口。",
+          "required": true,
+          "secret": true
+        }
+      ]
+    },
+    {
       "name": "podcast-generation",
       "description": "Convert text content into a two-host conversational podcast audio format.",
       "version": "1.0.0",
