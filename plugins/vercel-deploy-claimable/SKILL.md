@@ -8,6 +8,17 @@ metadata:
 
 # Vercel Deploy
 
+## Runtime Paths
+
+The Agent context should provide the absolute path to this `SKILL.md`. Derive bundled files from that path instead of using fixed virtual mount paths:
+
+```bash
+SKILL_DIR="$(cd "$(dirname "$SKILL_MD_PATH")" && pwd)"
+```
+
+Use `$SKILL_DIR/scripts/deploy.sh` for the bundled deployment script.
+
+
 Deploy any project to Vercel instantly. No authentication required.
 
 ## How It Works
@@ -20,7 +31,7 @@ Deploy any project to Vercel instantly. No authentication required.
 ## Usage
 
 ```bash
-bash /mnt/skills/user/vercel-deploy/scripts/deploy.sh [path]
+bash "$SKILL_DIR/scripts/deploy.sh" [path]
 ```
 
 **Arguments:**
@@ -30,13 +41,13 @@ bash /mnt/skills/user/vercel-deploy/scripts/deploy.sh [path]
 
 ```bash
 # Deploy current directory
-bash /mnt/skills/user/vercel-deploy/scripts/deploy.sh
+bash "$SKILL_DIR/scripts/deploy.sh"
 
 # Deploy specific project
-bash /mnt/skills/user/vercel-deploy/scripts/deploy.sh /path/to/project
+bash "$SKILL_DIR/scripts/deploy.sh" /path/to/project
 
 # Deploy existing tarball
-bash /mnt/skills/user/vercel-deploy/scripts/deploy.sh /path/to/project.tgz
+bash "$SKILL_DIR/scripts/deploy.sh" /path/to/project.tgz
 ```
 
 ## Output

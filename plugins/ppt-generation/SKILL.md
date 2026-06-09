@@ -5,6 +5,19 @@ description: "**FALLBACK skill for presentations.** Use this skill ONLY when the
 
 # PPT Generation Skill
 
+
+## Runtime Paths
+
+The Agent context should provide the absolute path to this `SKILL.md`. Derive bundled files from that path instead of using fixed virtual mount paths:
+
+```bash
+SKILL_DIR="$(cd "$(dirname "$SKILL_MD_PATH")" && pwd)"
+WORKSPACE_DIR="${WORKSPACE_DIR:-$PWD/workspace}"
+OUTPUT_DIR="${OUTPUT_DIR:-$PWD/outputs}"
+```
+
+Use `$SKILL_DIR/scripts/generate.py` for this skill's PPTX composer. For slide image generation, resolve the installed `image-generation` skill separately and derive `IMAGE_SKILL_DIR` from its `SKILL.md` path; then call `$IMAGE_SKILL_DIR/scripts/generate.py`. Use Agent-provided workspace and output paths for user files; create output directories if needed.
+
 ## Overview
 
 This skill generates professional PowerPoint presentations by creating AI-generated images for each slide and composing them into a PPTX file. The workflow includes planning the presentation structure with a consistent visual style, generating slide images sequentially (using the previous slide as a reference for style consistency), and assembling them into a final presentation.
@@ -43,11 +56,11 @@ When a user requests presentation generation, identify:
 - **Style**: business / academic / minimal / keynote / creative
 - Aspect ratio: Standard (16:9) or classic (4:3)
 - Content outline: Key points for each slide
-- You don't need to check the folder under `/mnt/user-data`
+- Use Agent-provided workspace, upload, and output paths; do not assume any fixed virtual mount directory
 
 ### Step 2: Create Presentation Plan
 
-Create a JSON file in `/mnt/user-data/workspace/` with the presentation structure. **Important**: Include the `style` field to define the overall visual consistency.
+Create a JSON file in `$WORKSPACE_DIR/` with the presentation structure. **Important**: Include the `style` field to define the overall visual consistency.
 
 ```json
 {
@@ -83,7 +96,7 @@ Create a JSON file in `/mnt/user-data/workspace/` with the presentation structur
 
 **IMPORTANT**: Generate slides **strictly one by one, in order**. Do NOT parallelize or batch image generation. Each slide depends on the previous slide's output as a reference image. Generating slides in parallel will break visual consistency and is not allowed.
 
-1. Read the image-generation skill: `/mnt/skills/public/image-generation/SKILL.md`
+1. Read the image-generation skill: the installed `image-generation` skill `SKILL.md`
 
 2. **For the FIRST slide (slide 1)**, create a prompt that establishes the visual style:
 
@@ -98,9 +111,9 @@ Create a JSON file in `/mnt/user-data/workspace/` with the presentation structur
 ```
 
 ```bash
-python /mnt/skills/public/image-generation/scripts/generate.py \
-  --prompt-file /mnt/user-data/workspace/slide-01-prompt.json \
-  --output-file /mnt/user-data/outputs/slide-01.jpg \
+python "$IMAGE_SKILL_DIR/scripts/generate.py" \
+  --prompt-file $WORKSPACE_DIR/slide-01-prompt.json \
+  --output-file $OUTPUT_DIR/slide-01.jpg \
   --aspect-ratio 16:9
 ```
 
@@ -117,10 +130,10 @@ python /mnt/skills/public/image-generation/scripts/generate.py \
 ```
 
 ```bash
-python /mnt/skills/public/image-generation/scripts/generate.py \
-  --prompt-file /mnt/user-data/workspace/slide-02-prompt.json \
-  --reference-images /mnt/user-data/outputs/slide-01.jpg \
-  --output-file /mnt/user-data/outputs/slide-02.jpg \
+python "$IMAGE_SKILL_DIR/scripts/generate.py" \
+  --prompt-file $WORKSPACE_DIR/slide-02-prompt.json \
+  --reference-images $OUTPUT_DIR/slide-01.jpg \
+  --output-file $OUTPUT_DIR/slide-02.jpg \
   --aspect-ratio 16:9
 ```
 
@@ -128,17 +141,17 @@ python /mnt/skills/public/image-generation/scripts/generate.py \
 
 ```bash
 # Slide 3 references slide 2
-python /mnt/skills/public/image-generation/scripts/generate.py \
-  --prompt-file /mnt/user-data/workspace/slide-03-prompt.json \
-  --reference-images /mnt/user-data/outputs/slide-02.jpg \
-  --output-file /mnt/user-data/outputs/slide-03.jpg \
+python "$IMAGE_SKILL_DIR/scripts/generate.py" \
+  --prompt-file $WORKSPACE_DIR/slide-03-prompt.json \
+  --reference-images $OUTPUT_DIR/slide-02.jpg \
+  --output-file $OUTPUT_DIR/slide-03.jpg \
   --aspect-ratio 16:9
 
 # Slide 4 references slide 3
-python /mnt/skills/public/image-generation/scripts/generate.py \
-  --prompt-file /mnt/user-data/workspace/slide-04-prompt.json \
-  --reference-images /mnt/user-data/outputs/slide-03.jpg \
-  --output-file /mnt/user-data/outputs/slide-04.jpg \
+python "$IMAGE_SKILL_DIR/scripts/generate.py" \
+  --prompt-file $WORKSPACE_DIR/slide-04-prompt.json \
+  --reference-images $OUTPUT_DIR/slide-03.jpg \
+  --output-file $OUTPUT_DIR/slide-04.jpg \
   --aspect-ratio 16:9
 ```
 
@@ -147,10 +160,10 @@ python /mnt/skills/public/image-generation/scripts/generate.py \
 After all slide images are generated, call the composition script:
 
 ```bash
-python /mnt/skills/public/ppt-generation/scripts/generate.py \
-  --plan-file /mnt/user-data/workspace/presentation-plan.json \
-  --slide-images /mnt/user-data/outputs/slide-01.jpg /mnt/user-data/outputs/slide-02.jpg /mnt/user-data/outputs/slide-03.jpg \
-  --output-file /mnt/user-data/outputs/presentation.pptx
+python "$SKILL_DIR/scripts/generate.py" \
+  --plan-file $WORKSPACE_DIR/presentation-plan.json \
+  --slide-images $OUTPUT_DIR/slide-01.jpg $OUTPUT_DIR/slide-02.jpg $OUTPUT_DIR/slide-03.jpg \
+  --output-file $OUTPUT_DIR/presentation.pptx
 ```
 
 Parameters:
@@ -168,7 +181,7 @@ User request: "Create a presentation about AI product launch"
 
 ### Step 1: Create presentation plan
 
-Create `/mnt/user-data/workspace/ai-product-plan.json`:
+Create `$WORKSPACE_DIR/ai-product-plan.json`:
 ```json
 {
   "title": "Introducing Nova AI",
@@ -224,13 +237,13 @@ Create `/mnt/user-data/workspace/ai-product-plan.json`:
 
 ### Step 2: Read image-generation skill
 
-Read `/mnt/skills/public/image-generation/SKILL.md` to understand how to generate images.
+Read the installed `image-generation` skill `SKILL.md` to understand how to generate images.
 
 ### Step 3: Generate slide images sequentially with reference chaining
 
 **Slide 1 - Title (establishes the visual language):**
 
-Create `/mnt/user-data/workspace/nova-slide-01.json`:
+Create `$WORKSPACE_DIR/nova-slide-01.json`:
 ```json
 {
   "prompt": "Ultra-premium presentation title slide with glassmorphism design. Background: smooth flowing gradient from deep purple (#667eea) through magenta (#f093fb) to cyan (#00d4ff), soft and vibrant. Center: large frosted glass panel with strong backdrop blur effect, rounded corners 32px, containing bold white sans-serif title 'Introducing Nova AI' (72pt, SF Pro Display style, font-weight 700) with subtle text shadow, subtitle 'Intelligence, Reimagined' below in lighter weight. The glass panel has subtle white border (1px rgba 255,255,255,0.25) and soft purple-tinted drop shadow. Floating around the card: 3D glass spheres with refraction, translucent geometric shapes (icosahedrons, abstract blobs), creating depth and dimension. Soft luminous glow emanating from behind the glass panel. Small floating particles of light. Apple Vision Pro / visionOS UI aesthetic. Professional presentation slide, 16:9 aspect ratio. Hyper-modern, premium tech product launch feel.",
@@ -243,15 +256,15 @@ Create `/mnt/user-data/workspace/nova-slide-01.json`:
 ```
 
 ```bash
-python /mnt/skills/public/image-generation/scripts/generate.py \
-  --prompt-file /mnt/user-data/workspace/nova-slide-01.json \
-  --output-file /mnt/user-data/outputs/nova-slide-01.jpg \
+python "$IMAGE_SKILL_DIR/scripts/generate.py" \
+  --prompt-file $WORKSPACE_DIR/nova-slide-01.json \
+  --output-file $OUTPUT_DIR/nova-slide-01.jpg \
   --aspect-ratio 16:9
 ```
 
 **Slide 2 - Content (MUST reference slide 1 for consistency):**
 
-Create `/mnt/user-data/workspace/nova-slide-02.json`:
+Create `$WORKSPACE_DIR/nova-slide-02.json`:
 ```json
 {
   "prompt": "Presentation slide continuing EXACT visual style from reference image. SAME purple-to-cyan gradient background, SAME glassmorphism aesthetic, SAME typography style. Left side: frosted glass card with backdrop blur containing title 'Why Nova?' in bold white (matching reference font style), three feature points as subtle glass pill badges below. Right side: abstract 3D neural network visualization made of interconnected glass nodes with soft cyan glow, floating in space. Floating translucent geometric shapes (matching style from reference) adding depth. The frosted glass has identical treatment: white border, purple-tinted shadow, same blur intensity. CRITICAL: This slide must look like it belongs in the exact same presentation as the reference image - same colors, same glass treatment, same overall aesthetic.",
@@ -263,10 +276,10 @@ Create `/mnt/user-data/workspace/nova-slide-02.json`:
 ```
 
 ```bash
-python /mnt/skills/public/image-generation/scripts/generate.py \
-  --prompt-file /mnt/user-data/workspace/nova-slide-02.json \
-  --reference-images /mnt/user-data/outputs/nova-slide-01.jpg \
-  --output-file /mnt/user-data/outputs/nova-slide-02.jpg \
+python "$IMAGE_SKILL_DIR/scripts/generate.py" \
+  --prompt-file $WORKSPACE_DIR/nova-slide-02.json \
+  --reference-images $OUTPUT_DIR/nova-slide-01.jpg \
+  --output-file $OUTPUT_DIR/nova-slide-02.jpg \
   --aspect-ratio 16:9
 ```
 
@@ -281,10 +294,10 @@ Key consistency rules for subsequent slides:
 ### Step 4: Compose final PPT
 
 ```bash
-python /mnt/skills/public/ppt-generation/scripts/generate.py \
-  --plan-file /mnt/user-data/workspace/nova-plan.json \
-  --slide-images /mnt/user-data/outputs/nova-slide-01.jpg /mnt/user-data/outputs/nova-slide-02.jpg /mnt/user-data/outputs/nova-slide-03.jpg /mnt/user-data/outputs/nova-slide-04.jpg /mnt/user-data/outputs/nova-slide-05.jpg \
-  --output-file /mnt/user-data/outputs/nova-presentation.pptx
+python "$SKILL_DIR/scripts/generate.py" \
+  --plan-file $WORKSPACE_DIR/nova-plan.json \
+  --slide-images $OUTPUT_DIR/nova-slide-01.jpg $OUTPUT_DIR/nova-slide-02.jpg $OUTPUT_DIR/nova-slide-03.jpg $OUTPUT_DIR/nova-slide-04.jpg $OUTPUT_DIR/nova-slide-05.jpg \
+  --output-file $OUTPUT_DIR/nova-presentation.pptx
 ```
 
 ## Style-Specific Guidelines
@@ -413,7 +426,7 @@ python /mnt/skills/public/ppt-generation/scripts/generate.py \
 
 After generation:
 
-- The PPTX file is saved in `/mnt/user-data/outputs/`
+- The PPTX file is saved in `$OUTPUT_DIR/`
 - Share the generated presentation with user using `present_files` tool
 - Also share the individual slide images if requested
 - Provide brief description of the presentation

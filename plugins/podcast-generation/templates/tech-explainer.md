@@ -47,11 +47,13 @@ This is commonly used in signup flows, admin dashboards, or when importing users
 
 ## Generation Command
 
+Derive `$SKILL_DIR` from the installed podcast-generation `SKILL.md` path before calling the bundled script.
+
 ```bash
-python /mnt/skills/public/podcast-generation/scripts/generate.py \
-  --script-file /mnt/user-data/workspace/tech-explainer-script.json \
-  --output-file /mnt/user-data/outputs/tech-explainer-podcast.mp3 \
-  --transcript-file /mnt/user-data/outputs/tech-explainer-transcript.md
+python "$SKILL_DIR/scripts/generate.py" \
+  --script-file $WORKSPACE_DIR/tech-explainer-script.json \
+  --output-file $OUTPUT_DIR/tech-explainer-podcast.mp3 \
+  --transcript-file $OUTPUT_DIR/tech-explainer-transcript.md
 ```
 
 ## Tips for Technical Podcasts

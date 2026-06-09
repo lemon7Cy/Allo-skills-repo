@@ -8,8 +8,14 @@ You need to prepare a 15-minute talk for a group meeting about your recent work 
 
 ## Step 1: Generate the Project
 
+If the Agent only provides the absolute path to `SKILL.md`, derive the bundled script directory first:
+
 ```bash
-bash /mnt/skills/public/tdli-style-slides/scripts/create_tdli_slides.sh ~/Desktop ml-hep-talk
+SKILL_DIR="$(cd "$(dirname "$SKILL_MD_PATH")" && pwd)"
+```
+
+```bash
+bash "$SKILL_DIR/scripts/create_tdli_slides.sh" ~/Desktop ml-hep-talk
 ```
 
 Output:

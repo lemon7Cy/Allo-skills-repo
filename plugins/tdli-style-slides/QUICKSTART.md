@@ -2,8 +2,14 @@
 
 ## 1. Generate a New Slide Deck (30 seconds)
 
+If the Agent only provides the absolute path to `SKILL.md`, derive the bundled script directory first:
+
 ```bash
-bash /mnt/skills/public/tdli-style-slides/scripts/create_tdli_slides.sh ~/Desktop my-talk
+SKILL_DIR="$(cd "$(dirname "$SKILL_MD_PATH")" && pwd)"
+```
+
+```bash
+bash "$SKILL_DIR/scripts/create_tdli_slides.sh" ~/Desktop my-talk
 ```
 
 ## 2. Edit Metadata (2 minutes)

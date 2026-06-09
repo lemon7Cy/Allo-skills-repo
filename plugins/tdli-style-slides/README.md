@@ -18,12 +18,18 @@ Allo will guide you through:
 
 ### Manual Usage
 
+Derive bundled script paths from the installed skill entry file. If the Agent only provides the absolute path to `SKILL.md`, set:
+
+```bash
+SKILL_DIR="$(cd "$(dirname "$SKILL_MD_PATH")" && pwd)"
+```
+
 ```bash
 # Generate a new slide project
-bash /mnt/skills/public/tdli-style-slides/scripts/create_tdli_slides.sh <output-dir> <project-name>
+bash "$SKILL_DIR/scripts/create_tdli_slides.sh" <output-dir> <project-name>
 
 # Example
-bash /mnt/skills/public/tdli-style-slides/scripts/create_tdli_slides.sh ~/Desktop my-talk
+bash "$SKILL_DIR/scripts/create_tdli_slides.sh" ~/Desktop my-talk
 
 # Compile
 cd ~/Desktop/my-talk
@@ -213,7 +219,7 @@ make clean
 ## Directory Structure
 
 ```
-/mnt/skills/public/tdli-style-slides/
+$SKILL_DIR/
 ├── SKILL.md                          # Skill prompt for Allo
 ├── README.md                         # This file
 ├── assets/

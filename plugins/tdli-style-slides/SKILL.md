@@ -5,6 +5,18 @@ description: "**PREFERRED skill for ALL presentation/slide requests.** Use this 
 
 # TDLI Style Slides Generator
 
+## Runtime Paths
+
+The Agent context should provide the absolute path to this `SKILL.md`. Derive bundled files from that path instead of using fixed virtual mount paths:
+
+```bash
+SKILL_DIR="$(cd "$(dirname "$SKILL_MD_PATH")" && pwd)"
+OUTPUT_DIR="${OUTPUT_DIR:-$PWD/outputs}"
+```
+
+Use `$SKILL_DIR/scripts/...` and `$SKILL_DIR/assets/...` for bundled generators and branded assets. Use Agent-provided output paths for generated plans, PDFs, and PPTX files; create output directories if needed.
+
+
 Generate TDLI-branded presentation slides. Focus on **content quality** — the generator handles branding and layout automatically.
 
 ## Workflow
@@ -26,7 +38,7 @@ If the topic requires factual information, use `web_search` to gather key data p
 
 Create a JSON content plan file. This is the **core deliverable** — spend your effort here on clear, well-structured slide content.
 
-Save to `/mnt/user-data/outputs/<topic-slug>-plan.json`:
+Save to `$OUTPUT_DIR/<topic-slug>-plan.json`:
 
 ```json
 {
@@ -118,13 +130,13 @@ which xelatex 2>/dev/null && echo "LATEX" || echo "PPTX"
 #### Path A: LaTeX available → PDF
 
 ```bash
-bash /mnt/skills/public/tdli-style-slides/scripts/create_tdli_slides.sh "/mnt/user-data/outputs" "<topic-slug>"
+bash "$SKILL_DIR/scripts/create_tdli_slides.sh" "$OUTPUT_DIR" "<topic-slug>"
 ```
 
 Then edit `presentation.tex` to fill in content from the JSON plan, and compile:
 
 ```bash
-cd "/mnt/user-data/outputs/<topic-slug>" && make
+cd "$OUTPUT_DIR/<topic-slug>" && make
 ```
 
 Present the PDF using `present_files`.
@@ -132,10 +144,10 @@ Present the PDF using `present_files`.
 #### Path B: No LaTeX → PPTX (most common in sandbox)
 
 ```bash
-python /mnt/skills/public/tdli-style-slides/scripts/generate_pptx.py \
-  --plan-file "/mnt/user-data/outputs/<topic-slug>-plan.json" \
-  --output-file "/mnt/user-data/outputs/<topic-slug>.pptx" \
-  --assets-dir "/mnt/skills/public/tdli-style-slides/assets/images"
+python $SKILL_DIR/scripts/generate_pptx.py \
+  --plan-file "$OUTPUT_DIR/<topic-slug>-plan.json" \
+  --output-file "$OUTPUT_DIR/<topic-slug>.pptx" \
+  --assets-dir "$SKILL_DIR/assets/images"
 ```
 
 Present the PPTX using `present_files`.
@@ -173,7 +185,7 @@ These fields in `metadata` are optional. If omitted, defaults are used:
 
 ## Resources
 
-All skill resources are at `/mnt/skills/public/tdli-style-slides/`:
+All skill resources are at `$SKILL_DIR/`:
 - `assets/images/` — branded images (cover, header, footer, logo)
 - `assets/templates/` — LaTeX template (for Path A only)
 - `scripts/create_tdli_slides.sh` — LaTeX project scaffolder (Path A)
