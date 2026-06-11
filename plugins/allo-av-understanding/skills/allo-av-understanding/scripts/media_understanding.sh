@@ -23,6 +23,7 @@ Usage:
   $0 timeline JOB_ID
   $0 summary JOB_ID [refresh]
   $0 translation JOB_ID [target_language] [refresh]
+  $0 presentation JOB_ID [refresh]
   $0 qa JOB_ID "question text" [top_k]
   $0 video-url JOB_ID
 
@@ -336,6 +337,16 @@ except Exception:
       curl -sS --connect-timeout 10 --max-time 300 "$BASE_URL/api/jobs/$job_id/translation?target_language=$target_language&refresh=true"
     else
       curl -sS --connect-timeout 10 --max-time 300 "$BASE_URL/api/jobs/$job_id/translation?target_language=$target_language"
+    fi
+    ;;
+  presentation)
+    job_id="${2:-}"
+    refresh="${3:-false}"
+    need_arg job_id "$job_id"
+    if [ "$refresh" = "true" ]; then
+      curl -sS --connect-timeout 10 --max-time 180 "$BASE_URL/api/jobs/$job_id/presentation-evaluation?refresh=true"
+    else
+      curl -sS --connect-timeout 10 --max-time 120 "$BASE_URL/api/jobs/$job_id/presentation-evaluation"
     fi
     ;;
   qa)
