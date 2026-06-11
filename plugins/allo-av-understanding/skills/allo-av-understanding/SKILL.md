@@ -50,6 +50,36 @@ Use this skill when the user asks to:
 
 Do not use this skill for unrelated general QA, pure local ffmpeg tasks, or generic file management.
 
+## Hard Rule: Remote Service Only, No Local Fallback
+
+This skill is only a thin client for the remote Allo service. The remote service is the single source of any reliable result, because only it runs the processed recognition models (ASR, OCR, visual understanding, summarization). Local or offline processing is NOT a valid substitute.
+
+Before doing anything else, you MUST verify service health:
+
+```bash
+bash scripts/media_understanding.sh health
+```
+
+- If health returns `{"status":"ok"}` (exit `0`): proceed.
+- If health does not return ok, the command is unreachable, or it exits non-zero (exit `6`): STOP IMMEDIATELY.
+
+When the service is unhealthy or unreachable, you MUST NOT:
+
+- run any local or offline media analysis (no local `ffmpeg`, `ffprobe`-based analysis beyond duration, `faster-whisper`/`whisper`, local OCR, local pose/vision models, or any other on-device model);
+- improvise a substitute pipeline of your own;
+- fabricate, estimate, or guess a transcript, timeline, summary, score, or evaluation;
+- keep retrying blindly or burn tokens attempting workarounds.
+
+Instead, recall immediately and tell the user plainly:
+
+```text
+The audio/video understanding service is currently unavailable (health check failed), so a reliable analysis cannot be produced right now. No local fallback is used because its output would not be trustworthy. Please retry later.
+```
+
+The helper script enforces this too: `upload`/`submit`/`analyze` run a mandatory health pre-flight and abort with exit `6` before uploading if the service is down. Treat exit `6` as a hard stop, not an error to work around.
+
+If the service goes down mid-job (exit `4`), the same rule applies: do not switch to local processing. Preserve the `job_id` and resume later when the service is healthy again.
+
 ## Core Rule: This Is An Asynchronous Job API
 
 The upload endpoint does not mean the media has been fully processed. Upload only creates a job and returns a `job_id`.
@@ -181,8 +211,9 @@ Exit behavior:
 - exit `3`: hard wait timeout (only when a numeric max_wait was given); the remote job may still be running
 - exit `4`: service stayed unreachable for too many consecutive checks; the remote job may still be running
 - exit `5`: service is healthy but job status could not be read (likely an invalid `job_id`)
+- exit `6`: service health check failed before submission and the run was aborted. Do not fall back to local/offline processing. Report that the service is unavailable and stop.
 
-On exit `3` or `4`, preserve the `job_id` and resume later with `wait JOB_ID forever 5`.
+On exit `3` or `4`, preserve the `job_id` and resume later with `wait JOB_ID forever 5`. On exit `6`, do not retry locally; report the outage and ask the user to try again later.
 
 ### Fetch Timeline Evidence
 
@@ -269,11 +300,11 @@ These are mainly useful for UI playback and frame preview. Most agent workflows 
 
 ### Workflow A: User Provides A Media File
 
-1. Run health check.
-2. Submit the file and capture `job_id`.
+1. Run the health check first. If it does not return `status=ok` (exit `6`), STOP: do not upload, do not attempt any local/offline processing, and tell the user the service is unavailable and to retry later.
+2. Submit the file and capture `job_id`. (The script re-checks health before upload and aborts with exit `6` if the service is down.)
 3. Poll the job until `done` or `failed`. Do not stop polling just because an estimated time passed; while `/health` is alive, keep waiting.
 4. If done, fetch `timeline` and `summary`.
-5. If polling had to stop (service unreachable), return the `job_id`, current status, and continuation command.
+5. If polling had to stop (service unreachable, exit `4`), return the `job_id`, current status, and continuation command. Do not produce a local fallback report.
 6. Do not re-upload unless explicitly requested.
 
 Example:
@@ -325,12 +356,12 @@ Do not discard a `job_id` after timeout. The `job_id` is the durable handle for 
 
 ## Failure Handling
 
-- Health check fails: report service unavailable and do not upload.
-- Upload fails: report server response and do not retry blindly.
-- Polling stopped early (hard timeout or service unreachable): report not-ready state, keep `job_id`, and provide a continuation command (`wait JOB_ID forever 5`).
-- Job failed: report backend `error` and `message`.
+- Health check fails (exit `6`): the service is unavailable. Recall immediately. Report the service as unavailable and DO NOT upload, DO NOT fall back to any local/offline processing, and DO NOT fabricate results. See the Hard Rule above.
+- Upload fails: report server response and do not retry blindly. Do not switch to local processing.
+- Polling stopped early (hard timeout exit `3` or service unreachable exit `4`): report not-ready state, keep `job_id`, and provide a continuation command (`wait JOB_ID forever 5`). Do not switch to local processing.
+- Job failed (exit `2`): report backend `error` and `message`.
 - Summary/timeline unavailable while job is not done: poll or tell the user the job is still processing.
-- QA returns no citations: use summary/timeline fallback and disclose that QA retrieval did not find direct matches.
+- QA returns no citations: use summary/timeline fallback and disclose that QA retrieval did not find direct matches. (This is evidence fallback within the same job, not local processing.)
 
 ## Minimal Smoke Test
 

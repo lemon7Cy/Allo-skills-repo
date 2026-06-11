@@ -32,12 +32,15 @@ Environment:
   AV_UNDERSTANDING_MAX_WAIT_SECONDS        default: forever (poll until done/failed while service is healthy)
   AV_UNDERSTANDING_MAX_UNREACHABLE_CHECKS  default: 36 (consecutive failed liveness checks before giving up)
 
-Poll exit codes:
-  0  job done
+Exit codes:
+  0  ok / job done
   2  job failed (backend error)
   3  hard wait timeout (only when a numeric max_wait was given); job may still be running
   4  service unreachable for too many consecutive checks; job may still be running
   5  service is healthy but job status could not be read (likely bad job_id)
+  6  service health check failed BEFORE submission; aborted. DO NOT fall back to
+     local/offline processing. No reliable result is possible while the remote
+     service is down.
 USAGE
 }
 
@@ -104,6 +107,28 @@ service_alive() {
   curl -sS --connect-timeout 5 --max-time 15 "$BASE_URL/health" >/dev/null 2>&1
 }
 
+# Mandatory pre-flight gate. The remote service is the only source of reliable
+# results. If /health does not report ok, abort with exit 6 instead of letting
+# any caller continue. This is the recall switch: never proceed to a degraded
+# path when the backend is down.
+require_healthy() {
+  local body=""
+  body="$(curl -sS --connect-timeout 5 --max-time 15 "$BASE_URL/health" 2>/dev/null || true)"
+  local ok=""
+  if [ -n "$body" ]; then
+    ok="$(printf '%s' "$body" | python3 -c 'import json,sys
+try:
+    print("ok" if json.load(sys.stdin).get("status") == "ok" else "")
+except Exception:
+    print("")' 2>/dev/null || true)"
+  fi
+  if [ "$ok" != "ok" ]; then
+    json_event event service_health_gate_failed base_url "$BASE_URL" health_body "${body:-__NONE__}" action "abort" note "Remote service health check did not return status=ok. Aborting. DO NOT fall back to local or offline processing; any local result would be unreliable and waste tokens. Tell the user the service is unavailable and to retry later."
+    echo "service health check failed; aborting before submission. Do not fall back to local processing." >&2
+    exit 6
+  fi
+}
+
 upload_file() {
   local file="$1"
   need_arg file "$file"
@@ -111,6 +136,7 @@ upload_file() {
     echo "file not found: $file" >&2
     exit 1
   fi
+  require_healthy
   curl -sS --connect-timeout 10 --max-time 300 -X POST "$BASE_URL/api/videos" -F "file=@$file"
 }
 
@@ -188,7 +214,23 @@ poll_job() {
 cmd="${1:-}"
 case "$cmd" in
   health)
-    curl -sS --connect-timeout 10 --max-time 30 "$BASE_URL/health"
+    # Print the raw health response, then gate on it. Exit 6 when the service
+    # is not healthy so callers can treat "not ok" as a hard stop and never
+    # fall back to local/offline processing.
+    body="$(curl -sS --connect-timeout 10 --max-time 30 "$BASE_URL/health" 2>/dev/null || true)"
+    printf '%s\n' "${body:-}"
+    ok=""
+    if [ -n "$body" ]; then
+      ok="$(printf '%s' "$body" | python3 -c 'import json,sys
+try:
+    print("ok" if json.load(sys.stdin).get("status") == "ok" else "")
+except Exception:
+    print("")' 2>/dev/null || true)"
+    fi
+    if [ "$ok" != "ok" ]; then
+      echo "health check failed; service is unavailable. Do not fall back to local processing." >&2
+      exit 6
+    fi
     ;;
   upload|submit)
     file="${2:-}"
