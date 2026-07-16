@@ -1,6 +1,7 @@
 ---
 name: comps-analysis
-description: Build institutional-grade comparable company analyses with operating metrics, valuation multiples, and statistical benchmarking in Excel/spreadsheet format.
+description: >-
+  Build institutional-grade comparable company analyses with operating metrics, valuation multiples, and statistical benchmarking in Excel/spreadsheet format.
   Perfect for: Public company valuation, benchmarking, IPO pricing, outlier identification, IC presentations, sector overviews
   Not ideal for: Private companies without public peers, conglomerates, distressed/bankrupt, pre-revenue startups, unique business models
 ---
