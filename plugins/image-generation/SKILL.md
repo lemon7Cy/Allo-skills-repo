@@ -1,147 +1,118 @@
 ---
 name: image-generation
-description: Use this skill when the user requests to generate, create, imagine, or visualize images including characters, scenes, products, or any visual content. Supports text-to-image and image editing via MaaS platform gpt-image-2 API.
-tools: []
-version: "2.0.0"
-author: allo-official
+description: Generate or edit images with the MaaS OpenAI-compatible gpt-image-2 API, including structured prompts, reference images, and common aspect ratios.
+version: 2.0.0
 required_env:
   - GPT_IMAGE_API_KEY
-optional_env: []
+optional_env:
+  - GPT_IMAGE_BASE_URL
+  - GPT_IMAGE_MODEL
 credentials:
   - key: GPT_IMAGE_API_KEY
-    label: GPT Image 2 API Key
-    description: 用于调用 MaaS 平台 gpt-image-2 生图和编辑接口的认证 key。
+    label: GPT Image API Key
     required: true
     secret: true
 ---
 
-# Image Generation Skill
+# Image Generation
 
-## Overview
+Generate new images from text prompts or edit images using one or more references. Use the bundled script rather than hand-writing HTTP requests or curl commands.
 
-Generate or edit images via the MaaS platform using `gpt-image-2`. Supports text-to-image generation and image editing with reference images.
+## Configuration
 
-## Runtime Paths
+- `GPT_IMAGE_API_KEY` is required.
+- `GPT_IMAGE_BASE_URL` is optional and defaults to `http://47.104.0.249:28088/v1`.
+- `GPT_IMAGE_MODEL` is optional and defaults to `gpt-image-2`.
 
-The Agent context should provide the absolute path to this `SKILL.md`. Derive bundled files from that path instead of using fixed virtual mount paths:
+`GPT_IMAGE_BASE_URL` is the complete API base. A trailing slash is removed, but configured paths such as `/v1` are preserved.
 
-```bash
-SKILL_DIR="$(cd "$(dirname "$SKILL_MD_PATH")" && pwd)"
-WORKSPACE_DIR="${WORKSPACE_DIR:-$PWD/workspace}"
-OUTPUT_DIR="${OUTPUT_DIR:-$PWD/outputs}"
-UPLOAD_DIR="${UPLOAD_DIR:-$PWD/uploads}"
-```
+The script uses the OpenAI-compatible endpoints below:
 
-Create output directories if needed.
-
-## API Reference
-
-| Operation | Endpoint | Method |
-|-----------|----------|--------|
-| Generate | `http://221.0.79.251:8080/v1/images/generations` | `POST` |
-| Edit | `http://221.0.79.251:8080/v1/images/edits` | `POST` |
-
-| Parameter | Description | Values |
-|-----------|-------------|--------|
-| `model` | Model name | `gpt-image-2` (required) |
-| `prompt` | Text prompt | Required |
-| `n` | Number of images | Default `1` |
-| `size` | Image dimensions | `1024x1024`, `1024x1792`, `1792x1024` |
-| `response_format` | Return format | `b64_json` (default), `url` |
-| `quality` | Quality level | `standard`, `hd` |
-| `style` | Style | `vivid`, `natural` |
-| `stream` | Streaming | `true`, `false` |
+- No reference images: `POST {base}/images/generations` with JSON.
+- One or more reference images: `POST {base}/images/edits` with multipart form data. One reference uses `image`; multiple references use OpenAI-compatible `image[]` fields.
 
 ## Workflow
 
-### Step 1: Understand Requirements
+1. Understand the requested subject, style, composition, lighting, and output shape.
+2. Write an English prompt to a UTF-8 text or JSON file in the current workspace.
+3. Resolve the script path relative to this `SKILL.md`: `scripts/generate.py`.
+4. Invoke the script with an output path appropriate for the current runtime.
+5. Present the generated file and iterate when requested.
 
-When a user requests image generation, identify:
+Do not assume fixed `/mnt/skills` or `/mnt/user-data` paths. Use paths available in the current environment. JSON prompt files are supported; the complete file contents are sent as the prompt.
 
-- Subject/content: What should be in the image
-- Style preferences: Art style, mood, color palette
-- Technical specs: Aspect ratio, composition, lighting
-- Reference images: Any images to guide generation (use edit endpoint)
-- Size: Match the content type (portrait → `1024x1792`, landscape → `1792x1024`)
+## Script Invocation
 
-### Step 2: Generate Image
-
-```bash
-curl -s http://221.0.79.251:8080/v1/images/generations \
-  -H "Authorization: Bearer $GPT_IMAGE_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "gpt-image-2",
-    "prompt": "YOUR_PROMPT_HERE",
-    "n": 1,
-    "size": "1024x1024",
-    "response_format": "b64_json",
-    "quality": "standard",
-    "style": "vivid"
-  }'
-```
-
-### Step 3: Edit Image (with reference)
+From this skill directory:
 
 ```bash
-curl -s http://221.0.79.251:8080/v1/images/edits \
-  -H "Authorization: Bearer $GPT_IMAGE_API_KEY" \
-  -F "image=@$UPLOAD_DIR/input.png" \
-  -F "prompt=YOUR_EDIT_PROMPT" \
-  -F "model=gpt-image-2"
+python scripts/generate.py \
+  --prompt-file /path/to/prompt.json \
+  --output-file /path/to/outputs/generated-image.png \
+  --aspect-ratio 16:9
 ```
 
-### Step 4: Save Output
-
-Decode `b64_json` response and save:
+With references:
 
 ```bash
-RESPONSE=$(curl -s http://221.0.79.251:8080/v1/images/generations \
-  -H "Authorization: Bearer $GPT_IMAGE_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"model":"gpt-image-2","prompt":"A cute cat","response_format":"b64_json"}')
-
-echo "$RESPONSE" | python3 -c "
-import sys, json, base64
-data = json.load(sys.stdin)
-img = base64.b64decode(data['data'][0]['b64_json'])
-with open('$OUTPUT_DIR/generated.png', 'wb') as f:
-    f.write(img)
-"
+python scripts/generate.py \
+  --prompt-file /path/to/prompt.json \
+  --reference-images /path/to/ref1.png /path/to/ref2.jpg \
+  --output-file /path/to/outputs/edited-image.png \
+  --aspect-ratio portrait
 ```
 
-## Prompt Engineering Tips
+If invoking from another directory, construct the path to `scripts/generate.py` from the installed skill directory instead of hard-coding a machine-specific location.
 
-- Always write prompts in English for best results
-- Be specific about style, lighting, composition
-- Include negative concepts by describing what you DON'T want
-- Use `quality: "hd"` for detailed or professional images
-- Use `style: "natural"` for realistic photos, `vivid` for artistic
+## Parameters
 
-## Common Scenarios
+- `--prompt-file`: Required UTF-8 prompt file path.
+- `--reference-images`: Optional space-separated image paths. Supplying any reference selects the edits endpoint.
+- `--output-file`: Required output file path. Missing parent directories are created automatically.
+- `--aspect-ratio`: Optional; defaults to `16:9`.
 
-**Character Design**: Describe gender, age, ethnicity, clothing, pose, expression, setting
+Supported aspect ratios and output sizes:
 
-**Scene/Environment**: Describe location, time of day, weather, mood, atmosphere, focal points
+- `1:1` or `square`: `1024x1024`
+- `portrait`, `9:16`, or `2:3`: `1024x1792`
+- `landscape`, `16:9`, or `3:2`: `1792x1024`
 
-**Product Visualization**: Describe product details, materials, lighting, background, presentation angle
+## Python Entry Point
 
-**Illustration/Art**: Specify art style (watercolor, oil painting, digital art, anime), color palette, composition
+The script also exposes:
 
-## Output Handling
+```python
+generate_image(prompt_file, reference_images, output_file, aspect_ratio="16:9")
+```
 
-After generation:
+It returns a success message containing the absolute output path. Failures raise actionable exceptions; CLI failures are written to stderr and exit with status 1.
 
-- Images are saved to `$OUTPUT_DIR/`
-- Share generated images with user using `present_files` tool
-- Provide brief description of the generation result
-- Offer to iterate if adjustments needed
-- `revised_prompt` in response shows how the model interpreted your prompt
+## Prompt Guidance
 
-## Common Mistakes
+- Prefer English prompts for consistent model behavior.
+- Describe the subject, setting, style, composition, lighting, color palette, and exclusions.
+- Structured JSON is useful for complex scenes, but plain text is also accepted.
+- Refer to supplied images clearly, such as `[Image 1]` and `[Image 2]`, in the same order as `--reference-images`.
 
-- Forgetting `response_format` — defaults to `b64_json`, not `url`
-- Using unsupported sizes — stick to `1024x1024`, `1024x1792`, `1792x1024`
-- Missing `model` field — it's required
-- Writing prompts in non-English — always use English for best quality
-- Using generation endpoint for edits — use `/v1/images/edits` when modifying existing images
+Example prompt file:
+
+```json
+{
+  "subject": "A woman in 1990s Tokyo street fashion walking through Shibuya after rain",
+  "style": "35mm documentary street photography, natural film grain",
+  "composition": "medium shot, subject off-center, layered city background",
+  "lighting": "neon storefront reflections on wet pavement",
+  "color_palette": "muted warm skin tones with cyan and red accents",
+  "negative_prompt": "studio lighting, selfie angle, oversaturated colors, distorted hands"
+}
+```
+
+## Output And Errors
+
+The API may return either `data[0].b64_json` or `data[0].url`; the script saves both forms to `--output-file` using a same-directory temporary file and atomic replacement. A failed save cleans up the temporary file and preserves an existing output. Provider error text is redacted and bounded before it is reported. If generation fails, report the script's error rather than claiming an image was created. Common actionable errors include missing credentials, missing input files, unsupported aspect ratios, HTTP failures, and malformed provider responses.
+
+## Specific Templates
+
+Read a template only when it matches the request:
+
+- [Doraemon Comic](templates/doraemon.md)

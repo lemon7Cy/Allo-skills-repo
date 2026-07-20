@@ -276,7 +276,10 @@
       "required_env": [
         "GPT_IMAGE_API_KEY"
       ],
-      "optional_env": [],
+      "optional_env": [
+        "GPT_IMAGE_BASE_URL",
+        "GPT_IMAGE_MODEL"
+      ],
       "credentials": [
         {
           "key": "GPT_IMAGE_API_KEY",
