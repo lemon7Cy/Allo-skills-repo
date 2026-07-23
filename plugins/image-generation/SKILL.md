@@ -1,7 +1,7 @@
 ---
 name: image-generation
 description: Generate new images with gpt-image-2 through the shared DFCode image gateway. Use when the user asks to generate, draw, render, design, or create an image; do not use for image search, editing, or reference-image requests.
-version: 4.0.2
+version: 4.0.3
 required_env:
   - IMAGE_GATEWAY_KEY
 optional_env:
@@ -27,9 +27,10 @@ Follow this order exactly:
 4. Run `scripts/generate.py` from this skill directory.
 5. Do not pass `--reference-images`.
 6. Prefer a `.png` output filename for `gpt-image-2` output.
-7. Treat generation as successful only if the command exits with code 0, stdout contains `Successfully generated image to <absolute path>`, and that exact output file exists and is non-empty.
-8. Call `present_files` with a one-item `filepaths` list containing that exact absolute output path.
-9. Claim that the image was generated only after `present_files` returns `Successfully presented files`.
+7. Run the generation command exactly once for each user request. Do not immediately retry a timeout because the upstream Image 2 request may still complete after the local caller disconnects.
+8. Treat generation as successful only if the command exits with code 0, stdout contains `Successfully generated image to <absolute path>`, and that exact output file exists and is non-empty.
+9. Call `present_files` with a one-item `filepaths` list containing that exact absolute output path.
+10. Claim that the image was generated only after `present_files` returns `Successfully presented files`.
 
 If any check or the `present_files` call fails, report the failure honestly. Never say “已生成”, “生成完成”, “image is ready”, or an equivalent success claim without both generation and presentation proof.
 
@@ -50,6 +51,7 @@ Resolve `scripts/generate.py` relative to this skill directory. Do not hard-code
 - `IMAGE_GATEWAY_BASE_URL` defaults to `http://221.0.79.252:18120/v1`.
 - The model is fixed to `gpt-image-2` and cannot be changed through environment variables or command-line options.
 - Do not substitute, fall back to, or retry with any other image-generation model. Report the failure if `gpt-image-2` is unavailable.
+- The script allows up to 210 seconds for Image 2 to return, exceeding the gateway's 180-second upstream timeout.
 
 ## Parameters
 
@@ -60,6 +62,6 @@ Resolve `scripts/generate.py` relative to this skill directory. Do not hard-code
 
 ## Failure Contract
 
-If the command fails, the success line is missing, the output file is empty, or `present_files` fails, report the error and do not claim that an image was generated. Do not print Base64 response data or authentication values. Decline reference-image editing requests because the current gateway supports generation only.
+If the command fails, the success line is missing, the output file is empty, or `present_files` fails, report the error and do not claim that an image was generated. If the failure is a timeout, do not run the command again in the same turn; the upstream request may still be completing, and an immediate retry can duplicate generation work. Do not print Base64 response data or authentication values. Decline reference-image editing requests because the current gateway supports generation only.
 
 For Doraemon-style comics, read `templates/doraemon.md` before composing the prompt.

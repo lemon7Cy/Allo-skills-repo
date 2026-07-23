@@ -37,6 +37,8 @@ class TestImageGenerationSkill(unittest.TestCase):
         self.assertIn("Call `present_files`", content)
         self.assertIn("Successfully presented files", content)
         self.assertIn("only after `present_files`", content)
+        self.assertIn("Run the generation command exactly once", content)
+        self.assertIn("do not run the command again in the same turn", content)
 
     def test_marketplace_uses_dfcode_gateway_credentials(self):
         marketplace = json.loads(MARKETPLACE_PATH.read_text(encoding="utf-8"))
@@ -46,7 +48,7 @@ class TestImageGenerationSkill(unittest.TestCase):
             if plugin["name"] == "image-generation"
         )
 
-        self.assertEqual(entry["version"], "4.0.2")
+        self.assertEqual(entry["version"], "4.0.3")
         self.assertEqual(entry["required_env"], ["IMAGE_GATEWAY_KEY"])
         self.assertEqual(entry["optional_env"], ["IMAGE_GATEWAY_BASE_URL"])
         self.assertEqual(entry["credentials"][0]["key"], "IMAGE_GATEWAY_KEY")
@@ -76,6 +78,13 @@ class TestImageGenerationSkill(unittest.TestCase):
         self.assertNotIn("import requests", content)
         self.assertNotIn("from dotenv", content)
         self.assertIn("import urllib.request", content)
+
+    def test_read_timeout_exceeds_gateway_upstream_timeout(self):
+        connect_timeout, read_timeout = self.module.REQUEST_TIMEOUT
+
+        self.assertEqual(connect_timeout, 10)
+        self.assertEqual(read_timeout, 210)
+        self.assertGreater(read_timeout, 180)
 
     def test_default_configuration_targets_shared_gateway(self):
         with patch.dict(os.environ, {"IMAGE_GATEWAY_KEY": "test-key"}, clear=True):
