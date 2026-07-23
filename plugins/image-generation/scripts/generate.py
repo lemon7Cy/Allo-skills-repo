@@ -12,7 +12,7 @@ import urllib.request
 from pathlib import Path
 from typing import Any
 
-REQUEST_TIMEOUT = (10, 210)
+REQUEST_TIMEOUT = (10, 330)
 DEFAULT_BASE_URL = "http://221.0.79.252:18120/v1"
 IMAGE_MODEL = "gpt-image-2"
 MAX_PROMPT_LENGTH = 10_000

@@ -1,7 +1,7 @@
 ---
 name: image-generation
 description: Generate new images with gpt-image-2 through the shared DFCode image gateway. Use when the user asks to generate, draw, render, design, or create an image; do not use for image search, editing, or reference-image requests.
-version: 4.0.3
+version: 4.0.4
 required_env:
   - IMAGE_GATEWAY_KEY
 optional_env:
@@ -51,7 +51,7 @@ Resolve `scripts/generate.py` relative to this skill directory. Do not hard-code
 - `IMAGE_GATEWAY_BASE_URL` defaults to `http://221.0.79.252:18120/v1`.
 - The model is fixed to `gpt-image-2` and cannot be changed through environment variables or command-line options.
 - Do not substitute, fall back to, or retry with any other image-generation model. Report the failure if `gpt-image-2` is unavailable.
-- The script allows up to 210 seconds for Image 2 to return, exceeding the gateway's 180-second upstream timeout.
+- The script allows up to 330 seconds for Image 2 to return, exceeding the gateway's 300-second upstream timeout.
 
 ## Parameters
 

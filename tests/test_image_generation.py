@@ -48,7 +48,7 @@ class TestImageGenerationSkill(unittest.TestCase):
             if plugin["name"] == "image-generation"
         )
 
-        self.assertEqual(entry["version"], "4.0.3")
+        self.assertEqual(entry["version"], "4.0.4")
         self.assertEqual(entry["required_env"], ["IMAGE_GATEWAY_KEY"])
         self.assertEqual(entry["optional_env"], ["IMAGE_GATEWAY_BASE_URL"])
         self.assertEqual(entry["credentials"][0]["key"], "IMAGE_GATEWAY_KEY")
@@ -83,8 +83,8 @@ class TestImageGenerationSkill(unittest.TestCase):
         connect_timeout, read_timeout = self.module.REQUEST_TIMEOUT
 
         self.assertEqual(connect_timeout, 10)
-        self.assertEqual(read_timeout, 210)
-        self.assertGreater(read_timeout, 180)
+        self.assertEqual(read_timeout, 330)
+        self.assertGreater(read_timeout, 300)
 
     def test_default_configuration_targets_shared_gateway(self):
         with patch.dict(os.environ, {"IMAGE_GATEWAY_KEY": "test-key"}, clear=True):
