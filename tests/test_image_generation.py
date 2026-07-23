@@ -46,13 +46,29 @@ class TestImageGenerationSkill(unittest.TestCase):
             if plugin["name"] == "image-generation"
         )
 
-        self.assertEqual(entry["version"], "4.0.1")
+        self.assertEqual(entry["version"], "4.0.2")
         self.assertEqual(entry["required_env"], ["IMAGE_GATEWAY_KEY"])
-        self.assertEqual(
-            entry["optional_env"],
-            ["IMAGE_GATEWAY_BASE_URL", "IMAGE_GENERATION_MODEL"],
-        )
+        self.assertEqual(entry["optional_env"], ["IMAGE_GATEWAY_BASE_URL"])
         self.assertEqual(entry["credentials"][0]["key"], "IMAGE_GATEWAY_KEY")
+
+    def test_skill_and_marketplace_lock_generation_to_gpt_image_2(self):
+        skill_content = SKILL_PATH.read_text(encoding="utf-8")
+        script_content = SCRIPT_PATH.read_text(encoding="utf-8")
+        marketplace = json.loads(MARKETPLACE_PATH.read_text(encoding="utf-8"))
+        entry = next(
+            plugin
+            for plugin in marketplace["plugins"]
+            if plugin["name"] == "image-generation"
+        )
+
+        self.assertIn("fixed to `gpt-image-2`", skill_content)
+        self.assertIn('IMAGE_MODEL = "gpt-image-2"', script_content)
+        self.assertNotIn("IMAGE_GENERATION_MODEL", skill_content)
+        self.assertNotIn("IMAGE_GENERATION_MODEL", script_content)
+        self.assertNotIn("IMAGE_GENERATION_MODEL", entry["optional_env"])
+        self.assertNotIn("grok-imagine", skill_content)
+        self.assertNotIn("grok-imagine", script_content)
+        self.assertNotIn("grok-imagine", json.dumps(entry))
 
     def test_script_has_no_third_party_runtime_dependency(self):
         content = SCRIPT_PATH.read_text(encoding="utf-8")
@@ -68,21 +84,22 @@ class TestImageGenerationSkill(unittest.TestCase):
                 (
                     "test-key",
                     "http://221.0.79.252:18120/v1",
-                    "grok-imagine-image",
                 ),
             )
 
-    def test_configuration_rejects_unknown_models(self):
+    def test_model_environment_override_is_ignored(self):
         with patch.dict(
             os.environ,
             {
                 "IMAGE_GATEWAY_KEY": "test-key",
-                "IMAGE_GENERATION_MODEL": "unknown-image-model",
+                "IMAGE_GENERATION_MODEL": "grok-imagine-image-quality",
             },
             clear=True,
         ):
-            with self.assertRaisesRegex(ValueError, "Unsupported image generation model"):
-                self.module._load_config()
+            self.assertEqual(
+                self.module._load_config(),
+                ("test-key", "http://221.0.79.252:18120/v1"),
+            )
 
     def test_reference_images_are_rejected(self):
         with self.assertRaisesRegex(ValueError, "does not support image editing"):
@@ -94,19 +111,21 @@ class TestImageGenerationSkill(unittest.TestCase):
             )
 
     def test_generation_writes_non_empty_output_and_returns_absolute_path(self):
-        jpeg_bytes = b"\xff\xd8\xff\xe0generated-jpeg"
+        png_bytes = b"\x89PNG\r\n\x1a\ngenerated-png"
         response_body = json.dumps(
-            {"data": [{"b64_json": base64.b64encode(jpeg_bytes).decode("ascii")}]}
+            {"data": [{"b64_json": base64.b64encode(png_bytes).decode("ascii")}]}
         ).encode("utf-8")
 
         with tempfile.TemporaryDirectory() as temp_dir:
             prompt_path = Path(temp_dir) / "prompt.txt"
-            output_path = Path(temp_dir) / "generated.jpg"
+            output_path = Path(temp_dir) / "generated.png"
             prompt_path.write_text("A blue circle on a white background", encoding="utf-8")
 
             with (
                 patch.dict(os.environ, {"IMAGE_GATEWAY_KEY": "test-key"}, clear=True),
-                patch.object(self.module, "_post_generation", return_value=response_body),
+                patch.object(
+                    self.module, "_post_generation", return_value=response_body
+                ) as post_generation,
             ):
                 result = self.module.generate_image(
                     str(prompt_path),
@@ -115,7 +134,14 @@ class TestImageGenerationSkill(unittest.TestCase):
                     "1:1",
                 )
 
-            self.assertEqual(output_path.read_bytes(), jpeg_bytes)
+            post_generation.assert_called_once_with(
+                "http://221.0.79.252:18120/v1",
+                "test-key",
+                "gpt-image-2",
+                "A blue circle on a white background",
+                "1024x1024",
+            )
+            self.assertEqual(output_path.read_bytes(), png_bytes)
             self.assertEqual(
                 result,
                 f"Successfully generated image to {output_path.resolve()}",
@@ -124,7 +150,7 @@ class TestImageGenerationSkill(unittest.TestCase):
     def test_prompt_length_is_bounded_before_network_request(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             prompt_path = Path(temp_dir) / "prompt.txt"
-            output_path = Path(temp_dir) / "generated.jpg"
+            output_path = Path(temp_dir) / "generated.png"
             prompt_path.write_text("x" * 10_001, encoding="utf-8")
 
             with patch.dict(os.environ, {"IMAGE_GATEWAY_KEY": "test-key"}, clear=True):

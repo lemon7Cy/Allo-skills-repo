@@ -14,14 +14,7 @@ from typing import Any
 
 REQUEST_TIMEOUT = (10, 120)
 DEFAULT_BASE_URL = "http://221.0.79.252:18120/v1"
-DEFAULT_MODEL = "grok-imagine-image"
-ALLOWED_MODELS = frozenset(
-    {
-        "gpt-image-2",
-        "grok-imagine-image",
-        "grok-imagine-image-quality",
-    }
-)
+IMAGE_MODEL = "gpt-image-2"
 MAX_PROMPT_LENGTH = 10_000
 ASPECT_RATIO_SIZES = {
     "1:1": "1024x1024",
@@ -39,7 +32,7 @@ SECRET_FIELD_NAMES = (
 )
 
 
-def _load_config() -> tuple[str, str, str]:
+def _load_config() -> tuple[str, str]:
     api_key = os.getenv("IMAGE_GATEWAY_KEY", "").strip()
     if not api_key:
         raise RuntimeError(
@@ -50,15 +43,7 @@ def _load_config() -> tuple[str, str, str]:
     if not base_url:
         raise RuntimeError("IMAGE_GATEWAY_BASE_URL cannot be empty.")
 
-    model = os.getenv("IMAGE_GENERATION_MODEL", DEFAULT_MODEL).strip()
-    if not model:
-        raise RuntimeError("IMAGE_GENERATION_MODEL cannot be empty.")
-    if model not in ALLOWED_MODELS:
-        supported = ", ".join(sorted(ALLOWED_MODELS))
-        raise ValueError(
-            f"Unsupported image generation model '{model}'. Supported models: {supported}."
-        )
-    return api_key, base_url, model
+    return api_key, base_url
 
 
 def _size_for_aspect_ratio(aspect_ratio: str) -> str:
@@ -293,7 +278,7 @@ def generate_image(
         raise ValueError(
             "The current DFCode image gateway does not support image editing or reference images."
         )
-    api_key, base_url, model = _load_config()
+    api_key, base_url = _load_config()
     prompt_path = _require_file(prompt_file, "prompt")
     prompt = prompt_path.read_text(encoding="utf-8")
     if not prompt.strip():
@@ -303,7 +288,7 @@ def generate_image(
             f"The image prompt exceeds the maximum length of {MAX_PROMPT_LENGTH:,} characters."
         )
     size = _size_for_aspect_ratio(aspect_ratio)
-    response_body = _post_generation(base_url, api_key, model, prompt, size)
+    response_body = _post_generation(base_url, api_key, IMAGE_MODEL, prompt, size)
 
     image_bytes = _image_bytes(response_body, api_key)
     output_path = Path(output_file).expanduser()

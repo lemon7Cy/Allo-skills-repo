@@ -269,16 +269,15 @@
     },
     {
       "name": "image-generation",
-      "description": "Generate new images through the shared DFCode image gateway; use for creation, not image search or editing.",
-      "version": "4.0.1",
+      "description": "Generate new images exclusively with gpt-image-2 through the shared DFCode image gateway; use for creation, not image search or editing.",
+      "version": "4.0.2",
       "category": "creative",
       "source": "./plugins/image-generation",
       "required_env": [
         "IMAGE_GATEWAY_KEY"
       ],
       "optional_env": [
-        "IMAGE_GATEWAY_BASE_URL",
-        "IMAGE_GENERATION_MODEL"
+        "IMAGE_GATEWAY_BASE_URL"
       ],
       "credentials": [
         {
