@@ -1,118 +1,66 @@
 ---
 name: image-generation
-description: Generate or edit images with the MaaS OpenAI-compatible gpt-image-2 API, including structured prompts, reference images, and common aspect ratios.
-version: 2.0.0
+description: Generate new images through the shared DFCode image gateway. Use when the user asks to generate, draw, render, design, or create an image; do not use for image search, editing, or reference-image requests.
+version: 4.0.1
 required_env:
-  - GPT_IMAGE_API_KEY
+  - IMAGE_GATEWAY_KEY
 optional_env:
-  - GPT_IMAGE_BASE_URL
-  - GPT_IMAGE_MODEL
+  - IMAGE_GATEWAY_BASE_URL
+  - IMAGE_GENERATION_MODEL
 credentials:
-  - key: GPT_IMAGE_API_KEY
-    label: GPT Image API Key
+  - key: IMAGE_GATEWAY_KEY
+    label: DFCode Image Gateway Key
     required: true
     secret: true
 ---
 
 # Image Generation
 
-Generate new images from text prompts or edit images using one or more references. Use the bundled script rather than hand-writing HTTP requests or curl commands.
+Use this skill when the user asks to generate, draw, render, design, or create a new image. Do not call `image_search` for a generation request. The current gateway supports generation only; it does not support editing or reference images.
 
-## Configuration
+## Required Workflow
 
-- `GPT_IMAGE_API_KEY` is required.
-- `GPT_IMAGE_BASE_URL` is optional and defaults to `http://47.104.0.249:28088/v1`.
-- `GPT_IMAGE_MODEL` is optional and defaults to `gpt-image-2`.
+Follow this order exactly:
 
-`GPT_IMAGE_BASE_URL` is the complete API base. A trailing slash is removed, but configured paths such as `/v1` are preserved.
+1. Write a complete UTF-8 prompt containing the subject, style, composition, lighting, palette, and exclusions.
+2. Keep the prompt non-empty and at most 10,000 characters.
+3. Save the prompt under the current workspace.
+4. Run `scripts/generate.py` from this skill directory.
+5. Do not pass `--reference-images`.
+6. Prefer a `.jpg` output filename because the default gateway model returns JPEG bytes.
+7. Treat generation as successful only if the command exits with code 0, stdout contains `Successfully generated image to <absolute path>`, and that exact output file exists and is non-empty.
+8. Call `present_files` with a one-item `filepaths` list containing that exact absolute output path.
+9. Claim that the image was generated only after `present_files` returns `Successfully presented files`.
 
-The script uses the OpenAI-compatible endpoints below:
+If any check or the `present_files` call fails, report the failure honestly. Never say “已生成”, “生成完成”, “image is ready”, or an equivalent success claim without both generation and presentation proof.
 
-- No reference images: `POST {base}/images/generations` with JSON.
-- One or more reference images: `POST {base}/images/edits` with multipart form data. One reference uses `image`; multiple references use OpenAI-compatible `image[]` fields.
-
-## Workflow
-
-1. Understand the requested subject, style, composition, lighting, and output shape.
-2. Write an English prompt to a UTF-8 text or JSON file in the current workspace.
-3. Resolve the script path relative to this `SKILL.md`: `scripts/generate.py`.
-4. Invoke the script with an output path appropriate for the current runtime.
-5. Present the generated file and iterate when requested.
-
-Do not assume fixed `/mnt/skills` or `/mnt/user-data` paths. Use paths available in the current environment. JSON prompt files are supported; the complete file contents are sent as the prompt.
-
-## Script Invocation
-
-From this skill directory:
+## Invocation
 
 ```bash
-python scripts/generate.py \
-  --prompt-file /path/to/prompt.json \
-  --output-file /path/to/outputs/generated-image.png \
+python3 scripts/generate.py \
+  --prompt-file /path/to/workspace/prompt.txt \
+  --output-file /path/to/outputs/generated-image.jpg \
   --aspect-ratio 16:9
 ```
 
-With references:
+Resolve `scripts/generate.py` relative to this skill directory. Do not hard-code a machine-specific skill path.
 
-```bash
-python scripts/generate.py \
-  --prompt-file /path/to/prompt.json \
-  --reference-images /path/to/ref1.png /path/to/ref2.jpg \
-  --output-file /path/to/outputs/edited-image.png \
-  --aspect-ratio portrait
-```
+## Configuration
 
-If invoking from another directory, construct the path to `scripts/generate.py` from the installed skill directory instead of hard-coding a machine-specific location.
+- `IMAGE_GATEWAY_KEY` is required and must be injected from secret storage.
+- `IMAGE_GATEWAY_BASE_URL` defaults to `http://221.0.79.252:18120/v1`.
+- `IMAGE_GENERATION_MODEL` defaults to `grok-imagine-image`.
+- Supported models are `gpt-image-2`, `grok-imagine-image`, and `grok-imagine-image-quality`.
 
 ## Parameters
 
-- `--prompt-file`: Required UTF-8 prompt file path.
-- `--reference-images`: Optional space-separated image paths. Supplying any reference selects the edits endpoint.
-- `--output-file`: Required output file path. Missing parent directories are created automatically.
-- `--aspect-ratio`: Optional; defaults to `16:9`.
+- `--prompt-file`: Required UTF-8 prompt file.
+- `--output-file`: Required output path; prefer `.jpg` with the default model.
+- `--aspect-ratio`: `1:1`, `square`, `portrait`, `9:16`, `2:3`, `landscape`, `16:9`, or `3:2`.
+- `--reference-images`: Unsupported. Do not pass this option with any files.
 
-Supported aspect ratios and output sizes:
+## Failure Contract
 
-- `1:1` or `square`: `1024x1024`
-- `portrait`, `9:16`, or `2:3`: `1024x1792`
-- `landscape`, `16:9`, or `3:2`: `1792x1024`
+If the command fails, the success line is missing, the output file is empty, or `present_files` fails, report the error and do not claim that an image was generated. Do not print Base64 response data or authentication values. Decline reference-image editing requests because the current gateway supports generation only.
 
-## Python Entry Point
-
-The script also exposes:
-
-```python
-generate_image(prompt_file, reference_images, output_file, aspect_ratio="16:9")
-```
-
-It returns a success message containing the absolute output path. Failures raise actionable exceptions; CLI failures are written to stderr and exit with status 1.
-
-## Prompt Guidance
-
-- Prefer English prompts for consistent model behavior.
-- Describe the subject, setting, style, composition, lighting, color palette, and exclusions.
-- Structured JSON is useful for complex scenes, but plain text is also accepted.
-- Refer to supplied images clearly, such as `[Image 1]` and `[Image 2]`, in the same order as `--reference-images`.
-
-Example prompt file:
-
-```json
-{
-  "subject": "A woman in 1990s Tokyo street fashion walking through Shibuya after rain",
-  "style": "35mm documentary street photography, natural film grain",
-  "composition": "medium shot, subject off-center, layered city background",
-  "lighting": "neon storefront reflections on wet pavement",
-  "color_palette": "muted warm skin tones with cyan and red accents",
-  "negative_prompt": "studio lighting, selfie angle, oversaturated colors, distorted hands"
-}
-```
-
-## Output And Errors
-
-The API may return either `data[0].b64_json` or `data[0].url`; the script saves both forms to `--output-file` using a same-directory temporary file and atomic replacement. A failed save cleans up the temporary file and preserves an existing output. Provider error text is redacted and bounded before it is reported. If generation fails, report the script's error rather than claiming an image was created. Common actionable errors include missing credentials, missing input files, unsupported aspect ratios, HTTP failures, and malformed provider responses.
-
-## Specific Templates
-
-Read a template only when it matches the request:
-
-- [Doraemon Comic](templates/doraemon.md)
+For Doraemon-style comics, read `templates/doraemon.md` before composing the prompt.

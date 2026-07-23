@@ -1,21 +1,28 @@
 import argparse
 import base64
 import binascii
-import mimetypes
+import http.client
+import json
 import os
 import re
 import sys
 import tempfile
-from contextlib import ExitStack
+import urllib.error
+import urllib.request
 from pathlib import Path
 from typing import Any
 
-import requests
-from dotenv import load_dotenv
-
 REQUEST_TIMEOUT = (10, 120)
-DEFAULT_BASE_URL = "http://47.104.0.249:28088/v1"
-DEFAULT_MODEL = "gpt-image-2"
+DEFAULT_BASE_URL = "http://221.0.79.252:18120/v1"
+DEFAULT_MODEL = "grok-imagine-image"
+ALLOWED_MODELS = frozenset(
+    {
+        "gpt-image-2",
+        "grok-imagine-image",
+        "grok-imagine-image-quality",
+    }
+)
+MAX_PROMPT_LENGTH = 10_000
 ASPECT_RATIO_SIZES = {
     "1:1": "1024x1024",
     "square": "1024x1024",
@@ -31,25 +38,26 @@ SECRET_FIELD_NAMES = (
     "api[_-]?key|access[_-]?token|token|key|signature|sig|password|authorization"
 )
 
-_ROOT_DIR = Path(__file__).resolve().parents[4]
-load_dotenv(_ROOT_DIR / ".env")
-load_dotenv(_ROOT_DIR / "backend/.env", override=True)
-
 
 def _load_config() -> tuple[str, str, str]:
-    api_key = os.getenv("GPT_IMAGE_API_KEY", "").strip()
+    api_key = os.getenv("IMAGE_GATEWAY_KEY", "").strip()
     if not api_key:
         raise RuntimeError(
-            "GPT_IMAGE_API_KEY is required. Set it before running image generation."
+            "IMAGE_GATEWAY_KEY is required. Set it before running image generation."
         )
 
-    base_url = os.getenv("GPT_IMAGE_BASE_URL", DEFAULT_BASE_URL).strip().rstrip("/")
+    base_url = os.getenv("IMAGE_GATEWAY_BASE_URL", DEFAULT_BASE_URL).strip().rstrip("/")
     if not base_url:
-        raise RuntimeError("GPT_IMAGE_BASE_URL cannot be empty.")
+        raise RuntimeError("IMAGE_GATEWAY_BASE_URL cannot be empty.")
 
-    model = os.getenv("GPT_IMAGE_MODEL", DEFAULT_MODEL).strip()
+    model = os.getenv("IMAGE_GENERATION_MODEL", DEFAULT_MODEL).strip()
     if not model:
-        raise RuntimeError("GPT_IMAGE_MODEL cannot be empty.")
+        raise RuntimeError("IMAGE_GENERATION_MODEL cannot be empty.")
+    if model not in ALLOWED_MODELS:
+        supported = ", ".join(sorted(ALLOWED_MODELS))
+        raise ValueError(
+            f"Unsupported image generation model '{model}'. Supported models: {supported}."
+        )
     return api_key, base_url, model
 
 
@@ -95,28 +103,96 @@ def _sanitize_provider_text(text: str, api_key: str) -> str:
     return sanitized
 
 
-def _request_error(
-    action: str, exc: requests.RequestException, api_key: str
-) -> RuntimeError:
+def _request_error(action: str, exc: BaseException, api_key: str) -> RuntimeError:
     details = _sanitize_provider_text(str(exc), api_key)
     return RuntimeError(f"{action}: {details}" if details else action)
 
 
-def _raise_for_status(response: requests.Response, action: str, api_key: str) -> None:
+class _ReadTimeoutHTTPConnection(http.client.HTTPConnection):
+    def __init__(self, *args, read_timeout: int, **kwargs):
+        self.read_timeout = read_timeout
+        super().__init__(*args, **kwargs)
+
+    def connect(self) -> None:
+        super().connect()
+        self.sock.settimeout(self.read_timeout)
+
+
+class _ReadTimeoutHTTPSConnection(http.client.HTTPSConnection):
+    def __init__(self, *args, read_timeout: int, **kwargs):
+        self.read_timeout = read_timeout
+        super().__init__(*args, **kwargs)
+
+    def connect(self) -> None:
+        super().connect()
+        self.sock.settimeout(self.read_timeout)
+
+
+class _ReadTimeoutHTTPHandler(urllib.request.HTTPHandler):
+    def __init__(self, read_timeout: int):
+        self.read_timeout = read_timeout
+        super().__init__()
+
+    def http_open(self, req):
+        connection = lambda *args, **kwargs: _ReadTimeoutHTTPConnection(
+            *args, read_timeout=self.read_timeout, **kwargs
+        )
+        return self.do_open(connection, req)
+
+
+class _ReadTimeoutHTTPSHandler(urllib.request.HTTPSHandler):
+    def __init__(self, read_timeout: int):
+        self.read_timeout = read_timeout
+        super().__init__()
+
+    def https_open(self, req):
+        connection = lambda *args, **kwargs: _ReadTimeoutHTTPSConnection(
+            *args, read_timeout=self.read_timeout, **kwargs
+        )
+        return self.do_open(connection, req)
+
+
+def _urlopen(request: urllib.request.Request, timeout: tuple[int, int]):
+    opener = urllib.request.build_opener(
+        _ReadTimeoutHTTPHandler(timeout[1]),
+        _ReadTimeoutHTTPSHandler(timeout[1]),
+    )
+    return opener.open(request, timeout=timeout[0])
+
+
+def _read_response(request: urllib.request.Request) -> tuple[int, bytes]:
     try:
-        response.raise_for_status()
-    except requests.RequestException as exc:
-        details = _sanitize_provider_text(response.text.strip(), api_key)
+        response = _urlopen(request, REQUEST_TIMEOUT)
+        with response:
+            return response.getcode(), response.read()
+    except urllib.error.HTTPError as exc:
+        return exc.code, exc.read(MAX_PROVIDER_ERROR_LENGTH + 1)
+
+
+def _request_bytes(
+    request: urllib.request.Request,
+    action: str,
+    api_key: str,
+) -> bytes:
+    try:
+        status_code, body = _read_response(request)
+    except (urllib.error.URLError, TimeoutError, OSError) as exc:
+        raise _request_error(action, exc, api_key) from exc
+    if status_code >= 400:
+        details = _sanitize_provider_text(
+            body.decode("utf-8", errors="replace").strip(), api_key
+        )
         suffix = f" Provider response: {details}" if details else ""
         raise RuntimeError(
-            f"Image API {action} failed with HTTP {response.status_code}.{suffix}"
-        ) from exc
+            f"Image gateway {'download' if action.startswith('Failed to download') else 'request'} failed with HTTP {status_code}.{suffix}"
+        )
+    return body
 
 
-def _response_item(response: requests.Response) -> dict[str, Any]:
+def _response_item(body: bytes) -> dict[str, Any]:
     try:
-        payload = response.json()
-    except (ValueError, requests.JSONDecodeError) as exc:
+        payload = json.loads(body.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
         raise RuntimeError("Image API returned invalid JSON.") from exc
 
     try:
@@ -130,8 +206,8 @@ def _response_item(response: requests.Response) -> dict[str, Any]:
     return item
 
 
-def _image_bytes(response: requests.Response, api_key: str) -> bytes:
-    item = _response_item(response)
+def _image_bytes(response_body: bytes, api_key: str) -> bytes:
+    item = _response_item(response_body)
     encoded = item.get("b64_json")
     if encoded:
         try:
@@ -143,18 +219,19 @@ def _image_bytes(response: requests.Response, api_key: str) -> bytes:
 
     image_url = item.get("url")
     if image_url:
-        try:
-            download = requests.get(image_url, timeout=REQUEST_TIMEOUT)
-        except requests.RequestException as exc:
-            raise _request_error(
-                "Failed to download generated image URL", exc, api_key
-            ) from exc
-        _raise_for_status(download, "image download", api_key)
-        if not download.content:
+        request = urllib.request.Request(image_url, method="GET")
+        content = _request_bytes(
+            request, "Failed to download generated image URL", api_key
+        )
+        if not content:
             raise RuntimeError("Generated image URL returned an empty response body.")
-        return download.content
+        return content
 
     raise RuntimeError("Image API data[0] must contain b64_json or url.")
+
+
+def _authorization_headers(api_key: str) -> dict[str, str]:
+    return {"Authorization": f"Bearer {api_key}"}
 
 
 def _post_generation(
@@ -163,49 +240,25 @@ def _post_generation(
     model: str,
     prompt: str,
     size: str,
-) -> requests.Response:
-    return requests.post(
-        f"{base_url}/images/generations",
-        headers={"Authorization": f"Bearer {api_key}"},
-        json={
+) -> bytes:
+    body = json.dumps(
+        {
             "model": model,
             "prompt": prompt,
             "size": size,
-            "response_format": "b64_json",
-        },
-        timeout=REQUEST_TIMEOUT,
+            "n": 1,
+        }
+    ).encode("utf-8")
+    headers = _authorization_headers(api_key)
+    headers["Content-Type"] = "application/json"
+    headers["Accept"] = "application/json"
+    request = urllib.request.Request(
+        f"{base_url}/images/generations",
+        data=body,
+        headers=headers,
+        method="POST",
     )
-
-
-def _post_edit(
-    base_url: str,
-    api_key: str,
-    model: str,
-    prompt: str,
-    size: str,
-    reference_paths: list[Path],
-) -> requests.Response:
-    with ExitStack() as stack:
-        files = []
-        image_field = "image" if len(reference_paths) == 1 else "image[]"
-        for path in reference_paths:
-            content_type = (
-                mimetypes.guess_type(path.name)[0] or "application/octet-stream"
-            )
-            file_object = stack.enter_context(path.open("rb"))
-            files.append((image_field, (path.name, file_object, content_type)))
-        return requests.post(
-            f"{base_url}/images/edits",
-            headers={"Authorization": f"Bearer {api_key}"},
-            data={
-                "model": model,
-                "prompt": prompt,
-                "size": size,
-                "response_format": "b64_json",
-            },
-            files=files,
-            timeout=REQUEST_TIMEOUT,
-        )
+    return _request_bytes(request, "Could not reach the image API", api_key)
 
 
 def _atomic_write(output_path: Path, image_bytes: bytes) -> None:
@@ -236,34 +289,23 @@ def generate_image(
     output_file: str,
     aspect_ratio: str = "16:9",
 ) -> str:
+    if reference_images:
+        raise ValueError(
+            "The current DFCode image gateway does not support image editing or reference images."
+        )
     api_key, base_url, model = _load_config()
     prompt_path = _require_file(prompt_file, "prompt")
-    reference_paths = [
-        _require_file(reference_image, "reference image")
-        for reference_image in reference_images
-    ]
     prompt = prompt_path.read_text(encoding="utf-8")
     if not prompt.strip():
         raise ValueError(f"The prompt file is empty: {prompt_path}")
+    if len(prompt) > MAX_PROMPT_LENGTH:
+        raise ValueError(
+            f"The image prompt exceeds the maximum length of {MAX_PROMPT_LENGTH:,} characters."
+        )
     size = _size_for_aspect_ratio(aspect_ratio)
+    response_body = _post_generation(base_url, api_key, model, prompt, size)
 
-    try:
-        if reference_paths:
-            response = _post_edit(
-                base_url,
-                api_key,
-                model,
-                prompt,
-                size,
-                reference_paths,
-            )
-        else:
-            response = _post_generation(base_url, api_key, model, prompt, size)
-    except requests.RequestException as exc:
-        raise _request_error("Could not reach the image API", exc, api_key) from exc
-
-    _raise_for_status(response, "request", api_key)
-    image_bytes = _image_bytes(response, api_key)
+    image_bytes = _image_bytes(response_body, api_key)
     output_path = Path(output_file).expanduser()
     _atomic_write(output_path, image_bytes)
     return f"Successfully generated image to {output_path.resolve()}"
@@ -271,7 +313,7 @@ def generate_image(
 
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Generate images using a MaaS OpenAI-compatible image API"
+        description="Generate images using the DFCode image gateway"
     )
     parser.add_argument(
         "--prompt-file",
